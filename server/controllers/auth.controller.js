@@ -39,7 +39,10 @@ const register = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'An account with this email/username already exists. Please log in instead!' });
+    }
+    res.status(500).json({ message: error.message || 'Error creating account' });
   }
 };
 
