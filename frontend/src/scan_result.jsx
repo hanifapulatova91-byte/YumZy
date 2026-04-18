@@ -22,7 +22,17 @@ function ScanResult({ scanData, onNext, t }) {
     );
   }
 
-  const riskLevel = analysis.riskLevel || (analysis.safe ? 'safe' : 'dangerous');
+  // Smart risk level: if AI says unsafe but found NO specific allergens, it's "caution" not "dangerous"
+  const getRiskLevel = () => {
+    if (analysis.riskLevel) return analysis.riskLevel;
+    if (analysis.safe) return 'safe';
+    // No specific allergens flagged = incomplete data = caution, not dangerous
+    const hasRealFlags = analysis.allergenFlags?.length > 0 && 
+      !analysis.allergenFlags.includes('System Error') &&
+      analysis.allergenFlags[0] !== 'None';
+    return hasRealFlags ? 'dangerous' : 'caution';
+  };
+  const riskLevel = getRiskLevel();
   const colorMap = { safe: '#638d63', caution: '#e67e22', dangerous: '#c0392b' };
   const labelMap = { safe: t('safe'), caution: t('caution'), dangerous: t('dangerous') };
   const emojiMap = { safe: '✅', caution: '⚠️', dangerous: '🚫' };
