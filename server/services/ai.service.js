@@ -95,54 +95,54 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
     };
   };
 
-  // Perform local check first as a safety layer
-  const localCheck = getMockSafety(allergenList);
-
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const prompt = `You are an ELITE allergen safety expert. Analyze ingredients with 100% strictness.
-LANGUAGE: ${targetLang}.
+      const prompt = `Act as an ELITE Allergen Safety Expert. Your goal is 100% user safety.
+LANGUAGE: Respond in ${targetLang}.
 
-USER ALLERGENS: ${allergenList.join(', ')}
-PRODUCT: ${product.productName}
-INGREDIENTS: ${product.ingredientsText || 'None'}
+USER ALLERGIES: ${allergenList.join(', ')}
 
-RULES:
-1. If ANY ingredient is derived from or IS one of the user's allergens, "safe" MUST be false.
-2. Even if it "might contain" traces, mark it as unsafe.
+PRODUCT DATA:
+Name: ${product.productName}
+Brand: ${product.productBrand}
+Ingredients: ${product.ingredientsText || 'Not listed'}
+Tags: ${(product.allergensTags || []).join(', ')}
 
-Respond in JSON ONLY:
+STRICT RULES:
+1. If ANY ingredient, tag, or name matches or IS DERIVED FROM the user's allergens, "safe" MUST be false.
+2. Check for hidden names (e.g., Casein/Whey for Milk, Lecithin for Soy/Egg, etc.).
+3. If ingredients are missing, mark as unsafe if the product category is risky.
+
+Response JSON Format:
 {
   "safe": false,
-  "allergenFlags": ["flagged_item"],
-  "summary": "Clear safety warning."
+  "allergenFlags": ["list matched items here"],
+  "summary": "Direct, empathetic warning or confirmation in ${targetLang}."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages: [{ role: 'system', content: 'You are an allergen expert. Respond with valid JSON only. Safety is the top priority.' }, { role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are an allergen precision engine. Respond with valid JSON only. User safety is the only priority.' },
+          { role: 'user', content: prompt }
+        ],
         response_format: { type: 'json_object' },
-        temperature: 0.1,
-        max_tokens: 400,
+        temperature: 0,
+        max_tokens: 500,
       });
 
-      const aiResult = JSON.parse(response.choices[0].message.content);
-      
-      // Merge: If either local check or AI finds a problem, mark as unsafe
-      if (!localCheck.safe) {
-        return {
-          ...aiResult,
-          safe: false,
-          allergenFlags: [...new Set([...localCheck.allergenFlags, ...(aiResult.allergenFlags || [])])]
-        };
-      }
-      return aiResult;
+      return JSON.parse(response.choices[0].message.content);
     } catch (error) {
-      console.error('DEBUG: OpenAI Analysis Error:', error.message);
+      console.error('DEBUG: AI Analysis Error:', error.message);
     }
   }
 
-  return localCheck;
+  // Final emergency fallback if AI fails:
+  return { 
+    safe: false, 
+    allergenFlags: ["System Error"], 
+    summary: "Safety engine is currently offline. Please do not consume this product if you have allergies." 
+  };
 };
 
 /**
