@@ -60,11 +60,11 @@ export const api = {
     },
   },
   scan: {
-    processBarcode: async (barcode) => {
+    processBarcode: async (barcode, allergens = []) => {
       const res = await fetch(`${API_URL}/scan`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ barcode }),
+        body: JSON.stringify({ barcode, allergens }),
       });
       if (!res.ok) {
         const error = await res.json();
@@ -88,11 +88,11 @@ export const api = {
     },
   },
   recipes: {
-    generate: async (ingredients, language = 'en') => {
+    generate: async (ingredients, allergens = [], language = 'en') => {
       const res = await fetch(`${API_URL}/recipes/generate`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ ingredients, language }),
+        body: JSON.stringify({ ingredients, allergens, language }),
       });
       if (!res.ok) {
         const error = await res.json();

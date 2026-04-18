@@ -7,7 +7,7 @@ const getRecipeImage = (name, index) => {
   return `https://loremflickr.com/800/600/food,${encodeURIComponent(name || 'dish')}?lock=${index}`;
 };
 
-const RecipeGenerator = ({ onBack }) => {
+const RecipeGenerator = ({ onBack, allergens = [] }) => {
   const [ingredients, setIngredients] = useState('');
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState([]);
@@ -27,7 +27,8 @@ const RecipeGenerator = ({ onBack }) => {
 
     try {
       const ingredientList = ingredients.split(',').map(i => i.trim()).filter(i => i);
-      const data = await api.recipes.generate(ingredientList, 'en');
+      const allergenNames = allergens.map(a => typeof a === 'string' ? a : a.name);
+      const data = await api.recipes.generate(ingredientList, allergenNames, 'en');
       // Backend now returns { recipes: [...] }
       const recipeList = data.recipes || (Array.isArray(data) ? data : [data]);
       setRecipes(recipeList);

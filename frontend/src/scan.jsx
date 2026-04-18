@@ -49,7 +49,8 @@ function Scan({ onNext, t }) {
     if (!barcodeToScan) return;
     setLoading(true);
     try {
-      const data = await api.scan.processBarcode(barcodeToScan);
+      const allergenNames = allergens.map(a => typeof a === 'string' ? a : a.name);
+      const data = await api.scan.processBarcode(barcodeToScan, allergenNames);
       onNext('scan_result', data);
     } catch (error) {
       alert(error.message || 'Error processing barcode');
