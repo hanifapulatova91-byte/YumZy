@@ -9,7 +9,7 @@ const ScanHistory = require('../models/ScanHistory.model');
  * @param {string} barcode - The scanned barcode
  * @returns {Object} Scan result with product info and safety analysis
  */
-const processScan = async (userId, barcode, language = 'en') => {
+const processScan = async (userId, barcode, language = 'en', guestAllergens = []) => {
   // 1. Get user's allergy profile (if logged in)
   let profile = { allergens: [] };
   if (userId) {
@@ -28,7 +28,7 @@ const processScan = async (userId, barcode, language = 'en') => {
   }
 
   // 3. Analyze product safety with AI
-  const analysis = await analyzeProductSafety(product, profile, language);
+  const analysis = await analyzeProductSafety(product, profile, language, guestAllergens);
 
   // 4. Save to scan history (only for logged-in users)
   let scanId = null;
