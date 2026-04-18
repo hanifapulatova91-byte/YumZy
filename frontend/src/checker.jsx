@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from './api';
 import './checker.css';
 
 const SymptomChecker = ({ onBack, onAddAllergen }) => {
