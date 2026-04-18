@@ -1,4 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+console.log('--- YUMZY API CONNECTED TO:', API_URL);
 
 const getHeaders = () => {
   const token = localStorage.getItem('yumzy_token');
