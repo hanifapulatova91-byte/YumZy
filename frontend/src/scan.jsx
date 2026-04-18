@@ -12,13 +12,19 @@ function Scan({ onNext, allergens = [], t }) {
 
     if (scannerActive) {
       html5QrCode = new Html5Qrcode("reader");
-      const config = { fps: 20, qrbox: { width: 280, height: 180 } };
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 300, height: 150 },
+        aspectRatio: 1.7778,  // 16:9
+      };
 
       const startScanner = async () => {
         try {
-          // Prefer back camera (environment facing)
+          // Request high-res camera with autofocus for sharp barcode scanning
           await html5QrCode.start(
-            { facingMode: "environment" }, 
+            { 
+              facingMode: "environment",
+            }, 
             config,
             (decodedText) => {
               html5QrCode.stop().then(() => {
@@ -28,6 +34,21 @@ function Scan({ onNext, allergens = [], t }) {
             },
             () => {} // Ignored
           );
+          
+          // After starting, try to enable continuous autofocus via the video track
+          try {
+            const videoElement = document.querySelector('#reader video');
+            if (videoElement && videoElement.srcObject) {
+              const track = videoElement.srcObject.getVideoTracks()[0];
+              const capabilities = track.getCapabilities?.();
+              if (capabilities?.focusMode?.includes('continuous')) {
+                await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+              }
+            }
+          } catch (focusErr) {
+            // Autofocus not supported on this device, that's fine
+            console.log('Autofocus not available:', focusErr.message);
+          }
         } catch (err) {
           console.error("Camera failed:", err);
           alert("Could not access camera. Please ensure permissions are granted.");
