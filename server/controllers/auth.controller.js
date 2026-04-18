@@ -58,6 +58,8 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Please provide username and password' });
     }
 
+    const cleanUsername = username ? username.trim().toLowerCase() : '';
+
     // Find user and include password field
     const user = await User.findOne({ username: cleanUsername }).select('+password');
     if (!user) {

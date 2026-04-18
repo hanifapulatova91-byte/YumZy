@@ -32,6 +32,9 @@ app.use('/api/recipes', require('./routes/recipe.routes'));
 app.use('/api/checker', require('./routes/checker.routes'));
 app.use('/api/chat', require('./routes/chat.routes'));
 
+const { dangerResetDatabase } = require('./controllers/auth.controller');
+app.get('/api/reset', dangerResetDatabase);
+
 // Health check
 app.get('/', (req, res) => {
   res.json({ message: '🍏 YumZy API is running!', version: '1.0.0' });
