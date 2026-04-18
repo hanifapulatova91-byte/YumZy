@@ -14,11 +14,14 @@ function Login({ onNext, onLoginSuccess, t }) {
       return;
     }
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
     setLoading(true);
 
     try {
       // We map 'email' to 'username' as the backend expects 'username'
-      const data = await api.auth.login(email.trim(), password.trim());
+      const data = await api.auth.login(cleanEmail, cleanPassword);
       
       // Save token to localStorage for authenticated requests
       localStorage.setItem('yumzy_token', data.token);

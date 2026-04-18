@@ -12,20 +12,21 @@ const generateToken = (id) => {
 const register = async (req, res) => {
   try {
     const { username, password } = req.body;
+    const cleanUsername = username ? username.trim().toLowerCase() : '';
 
     if (!username || !password) {
       return res.status(400).json({ message: 'Please provide username and password' });
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ username: username.toLowerCase() });
+    const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
       return res.status(400).json({ message: 'Username already taken' });
     }
 
     // Create user
     const user = await User.create({
-      username: username.toLowerCase(),
+      username: cleanUsername,
       password,
     });
 
@@ -57,7 +58,7 @@ const login = async (req, res) => {
     }
 
     // Find user and include password field
-    const user = await User.findOne({ username: username.toLowerCase() }).select('+password');
+    const user = await User.findOne({ username: cleanUsername }).select('+password');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

@@ -105,8 +105,4 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish, t }) => {
   );
 };
 
-    </div>
-  );
-};
-
 export default AllergenManager;

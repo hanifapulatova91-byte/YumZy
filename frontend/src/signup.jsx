@@ -15,16 +15,20 @@ function Signup({ onNext, onSignupSuccess, t }) {
       return;
     }
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+    const cleanName = name.trim();
+
     setLoading(true);
     try {
       // Map email to username for the backend
-      const data = await api.auth.register(email.trim(), password.trim());
+      const data = await api.auth.register(cleanEmail, cleanPassword);
       
       // Save token
       localStorage.setItem('yumzy_token', data.token);
-      localStorage.setItem('yumzy_user', JSON.stringify({ name: name.trim(), ...data }));
+      localStorage.setItem('yumzy_user', JSON.stringify({ name: cleanName, ...data }));
       
-      onSignupSuccess({ name: name.trim(), ...data });
+      onSignupSuccess({ name: cleanName, ...data });
       onNext('choice');
     } catch (error) {
       alert(error.message || 'Registration failed');
