@@ -8,22 +8,28 @@ const OFF_API_BASE = 'https://world.openfoodfacts.org/api/v0/product';
  * @returns {Object|null} Product data or null if not found
  */
 const getProductByBarcode = async (barcode) => {
-  try {
-    const url = `${OFF_API_BASE}/${barcode}.json?fields=product_name,brands,image_url,ingredients_text,allergens_tags,nutriments`;
-    console.log('DEBUG: Fetching barcode from:', url);
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'YumZy - Web App - Version 1.0 (contact@yumzy.app)',
-      },
-      timeout: 10000,
-    });
+  // We try the .net mirror which is often less restricted for cloud servers
+  const mirrors = [
+    `https://world.openfoodfacts.net/api/v0/product/${barcode}.json`,
+    `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+  ];
 
-    if (response.data.status === 0 || !response.data.product) {
-      console.log('DEBUG: Product not found in Open Food Facts for barcode:', barcode);
-      return null;
-    }
+  for (const url of mirrors) {
+    try {
+      console.log('DEBUG: Attempting barcode fetch from:', url);
+      const response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'YumZy - Web Platform - Version 1.0 (contact@yumzy.app)',
+        },
+        timeout: 8000,
+      });
 
-    const product = response.data.product;
+      if (response.data.status === 0 || !response.data.product) {
+        console.log('DEBUG: Product not found in this mirror:', url);
+        continue; // Try next mirror if 404
+      }
+
+      const product = response.data.product;
 
     return {
       productName: product.product_name || 'Unknown Product',
