@@ -5,7 +5,7 @@ const { protect } = require('../middleware/auth.middleware');
 
 // @desc    Analyze symptoms to suggest potential allergens
 // @route   POST /api/checker/analyze
-router.post('/analyze', protect, async (req, res) => {
+router.post('/analyze', async (req, res) => {
   try {
     const { symptoms } = req.body;
     if (!symptoms) {
