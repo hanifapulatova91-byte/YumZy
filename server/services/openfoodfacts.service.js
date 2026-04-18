@@ -31,20 +31,23 @@ const getProductByBarcode = async (barcode) => {
 
       const product = response.data.product;
 
-    return {
-      productName: product.product_name || 'Unknown Product',
-      productBrand: product.brands || '',
-      productImage: product.image_url || '',
-      ingredientsText: product.ingredients_text || '',
-      allergensTags: product.allergens_tags || [],
-    };
-  } catch (error) {
-    console.error('DEBUG: Open Food Facts API Error:', error.message);
-    if (error.response) {
-      console.error('DEBUG: OFF Error Details:', error.response.status, error.response.data);
+      return {
+        productName: product.product_name || 'Unknown Product',
+        productBrand: product.brands || '',
+        productImage: product.image_url || '',
+        ingredientsText: product.ingredients_text || '',
+        allergensTags: product.allergens_tags || [],
+      };
+    } catch (error) {
+      console.error(`DEBUG: Open Food Facts API Error on ${url}:`, error.message);
+      if (error.response) {
+        console.error('DEBUG: OFF Error Details:', error.response.status);
+      }
+      // Loop continues to next mirror
     }
-    return null;
   }
+
+  return null; // Both mirrors failed
 };
 
 module.exports = { getProductByBarcode };
