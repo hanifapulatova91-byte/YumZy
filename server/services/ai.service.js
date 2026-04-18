@@ -97,38 +97,35 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const prompt = `Act as an ELITE Allergen Safety Expert. Your goal is 100% user safety.
-LANGUAGE: Respond in ${targetLang}.
+      const prompt = `Act as an UNCOMPROMISING Allergen Safety Engine. 
+CRITICAL: If ANY of these allergens are detected or suspected, the result MUST be safe: false.
+USER ALLERGENS TO BLOCK: ${allergenList.join(', ')}
 
-USER ALLERGIES: ${allergenList.join(', ')}
-
-PRODUCT DATA:
+PRODUCT CONTEXT:
 Name: ${product.productName}
-Brand: ${product.productBrand}
-Ingredients: ${product.ingredientsText || 'Not listed'}
-Tags: ${(product.allergensTags || []).join(', ')}
+Ingredients: ${product.ingredientsText || 'NOT LISTED'}
+Allergen Tags: ${(product.allergensTags || []).join(', ')}
 
-STRICT RULES:
-1. If ANY ingredient, tag, or name matches or IS DERIVED FROM the user's allergens, "safe" MUST be false.
-2. Check for hidden names (e.g., Casein/Whey for Milk, Lecithin for Soy/Egg, etc.).
-3. If ingredients are missing, mark as unsafe if the product category is risky.
+TASK:
+1. Scan the "Ingredients" and "Tags" for the USER ALLERGENS.
+2. If the user is allergic to "Milk" or "Dairy", block ANYTHING containing lactose, whey, butter, cream, or milk.
+3. If the user is allergic to "Gluten" or "Wheat", block wheat, flour, or barley.
 
-Response JSON Format:
+OUTPUT JSON ONLY:
 {
   "safe": false,
-  "allergenFlags": ["list matched items here"],
-  "summary": "Direct, empathetic warning or confirmation in ${targetLang}."
+  "allergenFlags": ["item matched"],
+  "summary": "Direct safety report in ${targetLang}."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an allergen precision engine. Respond with valid JSON only. User safety is the only priority.' },
+          { role: 'system', content: 'You are a zero-tolerance allergen detection engine. You only speak JSON.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },
         temperature: 0,
-        max_tokens: 500,
       });
 
       return JSON.parse(response.choices[0].message.content);
