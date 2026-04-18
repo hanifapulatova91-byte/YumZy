@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
 const Profile = require('../models/Profile.model');
+const ScanHistory = require('../models/ScanHistory.model');
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -95,4 +96,33 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe };
+// @desc    RESET ENTIRE DATABASE - DANGEROUS
+// @route   GET /api/auth/reset-everything-danger-zone
+const dangerResetDatabase = async (req, res) => {
+  try {
+    const { confirm } = req.query;
+    
+    if (confirm !== 'yes') {
+      return res.status(400).json({ 
+        message: 'Please add ?confirm=yes to the URL to proceed with database wipe.' 
+      });
+    }
+
+    console.log('⚠️  DANGER: Starting Database Wipe...');
+    
+    await User.deleteMany({});
+    await Profile.deleteMany({});
+    await ScanHistory.deleteMany({});
+
+    console.log('✅ Database Cleared Successfully');
+    
+    res.json({ 
+      success: true, 
+      message: 'Database has been wiped clean. All users, profiles, and histories deleted.' 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { register, login, getMe, dangerResetDatabase };
