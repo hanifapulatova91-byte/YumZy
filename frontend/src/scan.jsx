@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from './api';
 import { Html5Qrcode } from 'html5-qrcode';
 
-function Scan({ onNext, t }) {
+function Scan({ onNext, allergens = [], t }) {
   const [loading, setLoading] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [scannerActive, setScannerActive] = useState(false);

@@ -161,11 +161,13 @@ function App() {
         />
       )}
 
+      {view === 'recipe' && (
         <RecipeGenerator 
           onBack={() => setView('dashboard')} 
           allergens={allergens}
           t={t} 
         />
+      )}
 
       {view === 'notes' && (
         <Notes onBack={() => setView('dashboard')} t={t} />
