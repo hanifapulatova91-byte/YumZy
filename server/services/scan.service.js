@@ -57,6 +57,7 @@ const processScan = async (userId, barcode, language = 'en', guestAllergens = []
     },
     analysis: {
       safe: analysis.safe,
+      riskLevel: analysis.riskLevel || (analysis.safe ? 'safe' : 'dangerous'),
       allergenFlags: analysis.allergenFlags,
       safeAlternatives: analysis.safeAlternatives || [],
       summary: analysis.summary,

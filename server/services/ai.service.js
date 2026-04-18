@@ -108,25 +108,29 @@ PRODUCT:
 - Allergen Tags: ${(product.allergensTags || []).join(', ')}
 
 RULES:
-1. ONLY flag allergens that are ACTUALLY PRESENT in the "Ingredients" or "Allergen Tags" fields above. Do NOT guess or assume.
-2. If an allergen is NOT mentioned anywhere in the ingredients or tags, it is NOT present. Do NOT hallucinate.
-3. Ingredients may be in any language. Translate to English. Format: "English Name (original word)". Example: "Soy (soja)".
-4. If "safe" is false, suggest 2-3 safe alternatives of the SAME product type (e.g., chocolate → dairy-free chocolate, not "coconut oil").
-5. If ingredients say "NOT LISTED", mark safe as false with summary "Ingredients not available - cannot verify safety."
+1. ONLY flag allergens ACTUALLY PRESENT in the "Ingredients" or "Allergen Tags". Do NOT guess.
+2. If an allergen is NOT in the data, do NOT flag it. Never hallucinate.
+3. Translate foreign ingredients to English. Format: "English Name (original word)".
+4. Use THREE risk levels:
+   - "safe" → No user allergens found in ingredients/tags. Ingredients data is available.
+   - "caution" → Ingredients are missing/incomplete, OR product "may contain" traces, OR the product category commonly contains the allergen but it's not explicitly listed.
+   - "dangerous" → User allergens are CONFIRMED present in the ingredients or tags.
+5. If "riskLevel" is "dangerous" or "caution", suggest 2-3 alternatives of the SAME product type.
 6. Respond in English only.
 
 JSON OUTPUT:
 {
+  "riskLevel": "safe" or "caution" or "dangerous",
   "safe": true or false,
-  "allergenFlags": ["only items actually found in ingredients"],
+  "allergenFlags": ["only confirmed items from ingredients"],
   "safeAlternatives": ["same-category allergen-free products"],
-  "summary": "Evidence-based safety report."
+  "summary": "Explain what was found and why this risk level was chosen."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a factual allergen analyzer. You ONLY report allergens that are explicitly listed in the provided ingredients or tags. You NEVER invent, assume, or hallucinate allergens. Respond in English JSON only.' },
+          { role: 'system', content: 'You are a factual allergen analyzer. You ONLY report allergens explicitly listed in the provided ingredients or tags. You NEVER invent or hallucinate. Use "caution" when data is incomplete. Respond in English JSON only.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },
@@ -141,6 +145,7 @@ JSON OUTPUT:
 
   // Final emergency fallback if AI fails:
   return { 
+    riskLevel: 'caution',
     safe: false, 
     allergenFlags: ["System Error"], 
     summary: "Safety engine is currently offline. Please do not consume this product if you have allergies." 

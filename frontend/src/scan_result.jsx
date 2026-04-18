@@ -22,8 +22,12 @@ function ScanResult({ scanData, onNext, t }) {
     );
   }
 
-  const color = analysis.safe ? '#638d63' : '#c0392b';
-  const label = analysis.safe ? t('safe') : t('dangerous');
+  const riskLevel = analysis.riskLevel || (analysis.safe ? 'safe' : 'dangerous');
+  const colorMap = { safe: '#638d63', caution: '#e67e22', dangerous: '#c0392b' };
+  const labelMap = { safe: t('safe'), caution: t('caution'), dangerous: t('dangerous') };
+  const emojiMap = { safe: '✅', caution: '⚠️', dangerous: '🚫' };
+  const color = colorMap[riskLevel] || '#c0392b';
+  const label = `${emojiMap[riskLevel] || ''} ${labelMap[riskLevel] || t('dangerous')}`;
 
   return (
     <div
@@ -85,7 +89,7 @@ function ScanResult({ scanData, onNext, t }) {
           </div>
         </div>
 
-        {!analysis.safe && analysis.safeAlternatives?.length > 0 && (
+        {riskLevel !== 'safe' && analysis.safeAlternatives?.length > 0 && (
           <div style={{ ...boxStyle, border: '1px solid #689767', background: '#f5fbf7' }}>
             <strong style={{ color: '#5b7856' }}>🥗 {t('safe_alternatives')}:</strong>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>

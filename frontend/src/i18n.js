@@ -63,6 +63,7 @@ export const translations = {
     // Scan Result
     scan_result_title: "Scan Result",
     safe: "SAFE",
+    caution: "CAUTION",
     dangerous: "DANGEROUS",
     ingredients: "Ingredients",
     allergen_flags: "Allergen Flags",
