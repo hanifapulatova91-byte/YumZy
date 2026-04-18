@@ -10,6 +10,7 @@ const OFF_API_BASE = 'https://world.openfoodfacts.org/api/v2/product';
 const getProductByBarcode = async (barcode) => {
   try {
     const url = `${OFF_API_BASE}/${barcode}?fields=product_name,brands,image_url,ingredients_text,allergens_tags,nutriments`;
+    console.log('DEBUG: Fetching barcode from:', url);
     const response = await axios.get(url, {
       headers: {
         'User-Agent': 'YumZy App/1.0 (contact@yumzy.app)',
@@ -18,6 +19,7 @@ const getProductByBarcode = async (barcode) => {
     });
 
     if (response.data.status === 0 || !response.data.product) {
+      console.log('DEBUG: Product not found in Open Food Facts for barcode:', barcode);
       return null;
     }
 
@@ -31,7 +33,10 @@ const getProductByBarcode = async (barcode) => {
       allergensTags: product.allergens_tags || [],
     };
   } catch (error) {
-    console.error('Open Food Facts API Error:', error.message);
+    console.error('DEBUG: Open Food Facts API Error:', error.message);
+    if (error.response) {
+      console.error('DEBUG: OFF Error Details:', error.response.status, error.response.data);
+    }
     return null;
   }
 };

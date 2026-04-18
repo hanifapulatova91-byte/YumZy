@@ -77,7 +77,8 @@ Respond ONLY with valid JSON in this exact format:
       summary: result.summary || '',
     };
   } catch (error) {
-    console.error('OpenAI Analysis Error:', error.message);
+    console.error('DEBUG: OpenAI Analysis Error:', error.message);
+    if (error.response) console.error('DEBUG: OpenAI Error Response:', error.response.data);
     return getMockSafety(); // Fallback on quota error
   }
 };
@@ -180,7 +181,7 @@ Respond ONLY with valid JSON in this exact format:
 
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    console.error('OpenAI Recipe Error:', error.message);
+    console.error('DEBUG: OpenAI Recipe Error:', error.message);
     return getMockRecipe(); // Fallback on quota error
   }
 };
@@ -225,7 +226,7 @@ Always keep their allergies in mind and NEVER recommend foods they are allergic 
 
     return { reply: response.choices[0].message.content };
   } catch (error) {
-    console.error('OpenAI Chat Error:', error.message);
+    console.error('DEBUG: OpenAI Chat Error:', error.message);
     return getMockChat(); // Fallback gracefully!
   }
 };
