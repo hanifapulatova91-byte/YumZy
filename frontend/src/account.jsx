@@ -2,7 +2,7 @@ import React from 'react';
 import './account.css';
 import mascot from './assets/mascot.png';
 
-const AccApp = ({ onNext, t, lang, toggleLanguage }) => {
+const AccApp = ({ onNext, onGuest, t, lang, toggleLanguage }) => {
   return (
     <div className="account_container">
       <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
@@ -48,7 +48,7 @@ const AccApp = ({ onNext, t, lang, toggleLanguage }) => {
           <span>{t('sign_up')}</span>
         </button>
 
-        <button onClick={() => onNext('choice')} className="btn_guest">
+        <button onClick={onGuest} className="btn_guest">
           {t('continue_guest')}
         </button>
       </div>

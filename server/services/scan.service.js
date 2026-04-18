@@ -10,10 +10,10 @@ const ScanHistory = require('../models/ScanHistory.model');
  * @returns {Object} Scan result with product info and safety analysis
  */
 const processScan = async (userId, barcode, language = 'en') => {
-  // 1. Get user's allergy profile
-  const profile = await Profile.findOne({ userId });
-  if (!profile) {
-    throw new Error('User profile not found. Please complete the allergy quiz first.');
+  // 1. Get user's allergy profile (if logged in)
+  let profile = { allergens: [] };
+  if (userId) {
+    profile = await Profile.findOne({ userId }) || { allergens: [] };
   }
 
   // 2. Fetch product data from Open Food Facts
@@ -30,18 +30,22 @@ const processScan = async (userId, barcode, language = 'en') => {
   // 3. Analyze product safety with AI
   const analysis = await analyzeProductSafety(product, profile, language);
 
-  // 4. Save to scan history
-  const scanRecord = await ScanHistory.create({
-    userId,
-    barcode,
-    productName: product.productName,
-    productBrand: product.productBrand,
-    productImage: product.productImage,
-    ingredientsText: product.ingredientsText,
-    safe: analysis.safe,
-    allergenFlags: analysis.allergenFlags,
-    aiSummary: analysis.summary,
-  });
+  // 4. Save to scan history (only for logged-in users)
+  let scanId = null;
+  if (userId) {
+    const scanRecord = await ScanHistory.create({
+      userId,
+      barcode,
+      productName: product.productName,
+      productBrand: product.productBrand,
+      productImage: product.productImage,
+      ingredientsText: product.ingredientsText,
+      safe: analysis.safe,
+      allergenFlags: analysis.allergenFlags,
+      aiSummary: analysis.summary,
+    });
+    scanId = scanRecord._id;
+  }
 
   return {
     found: true,
@@ -56,7 +60,7 @@ const processScan = async (userId, barcode, language = 'en') => {
       allergenFlags: analysis.allergenFlags,
       summary: analysis.summary,
     },
-    scanId: scanRecord._id,
+    scanId,
   };
 };
 

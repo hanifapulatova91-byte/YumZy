@@ -11,11 +11,14 @@ const converseAI = async (req, res) => {
       return res.status(400).json({ message: 'Message is required' });
     }
 
-    const profile = await Profile.findOne({ userId: req.user._id });
+    // Guests won't have req.user
+    let profile = {};
+    if (req.user && req.user._id) {
+       profile = await Profile.findOne({ userId: req.user._id }) || {};
+    }
     
-    // We can proceed even if profile is missing, as chatWithAI handles undefined profile
     const language = req.headers['accept-language'] || 'en';
-    const replyData = await chatWithAI(message, profile || {}, language);
+    const replyData = await chatWithAI(message, profile, language);
 
     res.json(replyData);
   } catch (error) {

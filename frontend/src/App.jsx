@@ -66,11 +66,20 @@ function App() {
     setView(pageName);
   };
 
+  const handleGuest = () => {
+    setUser(null);
+    localStorage.removeItem('yumzy_token');
+    localStorage.removeItem('yumzy_user');
+    setAllergens([]);
+    setView('choice');
+  };
+
   return (
     <div className="app_main_cont">
       {view === 'landing' && (
         <AccApp
           onNext={navigateTo}
+          onGuest={handleGuest}
           user={user}
           t={t}
           lang={language}

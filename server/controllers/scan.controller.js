@@ -12,7 +12,10 @@ const scanBarcode = async (req, res) => {
     }
 
     const language = req.headers['accept-language'] || 'en';
-    const result = await processScan(req.user._id, barcode, language);
+    // Handle Guest mode (req.user might be undefined)
+    const userId = req.user && req.user._id ? req.user._id : null;
+    
+    const result = await processScan(userId, barcode, language);
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });

@@ -11,10 +11,10 @@ const createRecipe = async (req, res) => {
       return res.status(400).json({ message: 'Please provide a list of ingredients' });
     }
 
-    // Get user's allergy profile
-    const profile = await Profile.findOne({ userId: req.user._id });
-    if (!profile) {
-      return res.status(400).json({ message: 'Profile not found. Please complete the allergy quiz first.' });
+    // Get user's allergy profile (if logged in)
+    let profile = { allergens: [] };
+    if (req.user && req.user._id) {
+       profile = await Profile.findOne({ userId: req.user._id }) || { allergens: [] };
     }
 
     const recipe = await generateRecipe(ingredients, profile, language || 'ru');
