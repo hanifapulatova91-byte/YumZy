@@ -44,42 +44,44 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
   }
 
   const getMockSafety = (allergens) => {
-    if (!allergens || allergens.length === 0) return { safe: true, allergenFlags: [], summary: 'No allergens to check.' };
+    // If no allergens are provided, we technically can't find matches, but we'll return 'Safe' 
+    // because there's nothing to be unsafe against.
+    if (!allergens || allergens.length === 0) {
+      return { 
+        safe: true, 
+        allergenFlags: [], 
+        summary: language === 'uz' ? 'Profilingizda allergenlar ko\'rsatilmagan.' : 'No allergens configured.' 
+      };
+    }
     
-    // Combine all text for searching
-    const textToSearch = [
-      product.productName,
-      product.ingredientsText,
-      ...(product.allergensTags || [])
-    ].join(' ').toLowerCase();
+    // Combine all available text for searching
+    const name = product.productName || '';
+    const ingredients = product.ingredientsText || '';
+    const tags = (product.allergensTags || []).join(' ');
+    
+    const textToSearch = `${name} ${ingredients} ${tags}`.toLowerCase();
 
     let flaggedAllergens = [];
     
     allergens.forEach(userAllergen => {
-      const lowerAllergen = userAllergen.toLowerCase();
+      if (!userAllergen) return;
       
-      // 1. Direct Keyword Check
+      const lowerAllergen = typeof userAllergen === 'string' ? userAllergen.toLowerCase() : userAllergen.name?.toLowerCase();
+      if (!lowerAllergen) return;
+
+      // 1. Precise Keyword Check (looks for the exact word or substring)
       if (textToSearch.includes(lowerAllergen)) {
-        flaggedAllergens.push(userAllergen);
+        flaggedAllergens.push(userAllergen.name || userAllergen);
         return;
       }
 
-      // 2. Exact word boundary check for better accuracy
-      const regex = new RegExp(`\\b${lowerAllergen}\\b`, 'i');
-      if (regex.test(textToSearch)) {
-        flaggedAllergens.push(userAllergen);
-        return;
-      }
-
-      // 3. Derivative check
+      // 2. Derivative & Hidden Name Check
+      // We check if any of the common derivatives from our safety list are present
       const derivatives = ALLERGEN_DERIVATIVES[lowerAllergen] || [];
-      const foundDerivative = derivatives.find(d => {
-        const derRegex = new RegExp(`\\b${d}\\b`, 'i');
-        return derRegex.test(textToSearch) || textToSearch.includes(d);
-      });
+      const foundDerivative = derivatives.find(d => textToSearch.includes(d));
       
       if (foundDerivative) {
-        flaggedAllergens.push(`${userAllergen} (${foundDerivative})`);
+        flaggedAllergens.push(`${userAllergen.name || userAllergen} (${foundDerivative})`);
       }
     });
 
@@ -88,8 +90,8 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
       safe: !isMockUnsafe,
       allergenFlags: [...new Set(flaggedAllergens)],
       summary: isMockUnsafe 
-        ? `[SAFETY MODE] DANGER: This product contains the following allergens: ${flaggedAllergens.join(', ')}.` 
-        : `[SAFETY MODE] This product seems safe based on your profile.`
+        ? `[SAFETY MODE] DANGER: This product contains: ${flaggedAllergens.join(', ')}.` 
+        : `[SAFETY MODE] This product is safe based on your selected allergens.`
     };
   };
 
