@@ -11,7 +11,15 @@ import qrIcon from './assets/qr.png';
 import slothHead from './assets/aiMascot.png';
 import phoneIcon from './assets/viber.png';
 
-const Dashboard = ({ userName = "Anna", onNext, t, lang, toggleLanguage }) => {
+const Dashboard = ({ userName = "Guest", onNext, t }) => {
+  const getDisplayName = (name) => {
+    if (!name || name === "Guest") return 'Guest';
+    if (name.includes('@')) {
+      const part = name.split('@')[0];
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    }
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
   const [activeTab, setActiveTab] = useState('home');
 
   const goTo = (tab) => {
@@ -26,23 +34,8 @@ const Dashboard = ({ userName = "Anna", onNext, t, lang, toggleLanguage }) => {
   return (
     <div className="dashboard_wrapper">
       <header className="main_header">
-        <h1 className="user_greeting">{t('greeting')}, {userName}!</h1>
+        <h1 className="user_greeting">{t('greeting')}, {getDisplayName(userName)}!</h1>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button 
-            onClick={toggleLanguage}
-            style={{ 
-              background: '#f0f9f1', 
-              border: '1px solid #d9e3dd', 
-              borderRadius: '8px', 
-              padding: '6px 10px',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              color: '#4a6b4c',
-              cursor: 'pointer'
-            }}
-          >
-            {lang === 'en' ? 'UZ' : 'EN'}
-          </button>
           <div className="avatar_circle" onClick={() => onNext('profile')}>
             <img src={userIcon} alt="User" />
           </div>

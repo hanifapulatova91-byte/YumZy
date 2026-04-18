@@ -19,18 +19,7 @@ import { translations } from './i18n';
 
 function App() {
   const [view, setView] = useState('landing');
-  const [language, setLanguage] = useState(localStorage.getItem('yumzy_lang') || 'en');
-  const [allergens, setAllergens] = useState([]);
-  const [scanData, setScanData] = useState(null);
-  const [user, setUser] = useState(null);
-
-  const t = (key) => translations[language][key] || key;
-
-  const toggleLanguage = () => {
-    const newLang = language === 'en' ? 'uz' : 'en';
-    setLanguage(newLang);
-    localStorage.setItem('yumzy_lang', newLang);
-  };
+  const t = (key) => translations['en'][key] || key;
 
   useEffect(() => {
     const savedUser = localStorage.getItem('yumzy_user');
@@ -82,8 +71,6 @@ function App() {
           onGuest={handleGuest}
           user={user}
           t={t}
-          lang={language}
-          toggleLanguage={toggleLanguage}
         />
       )}
 
@@ -132,10 +119,8 @@ function App() {
       {view === 'dashboard' && (
         <Dashboard
           onNext={navigateTo}
-          userName={user?.name || 'Anna'}
+          userName={user?.username || 'Guest'}
           t={t}
-          lang={language}
-          toggleLanguage={toggleLanguage}
         />
       )}
 

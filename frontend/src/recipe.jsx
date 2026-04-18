@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { api } from './api';
 import './recipe.css';
 
-const FOOD_IMAGES = [
-  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&q=80&w=800',
-];
+// Dynamic image helper
+const getRecipeImage = (name, index) => {
+  return `https://loremflickr.com/800/600/food,${encodeURIComponent(name || 'dish')}?lock=${index}`;
+};
 
 const RecipeGenerator = ({ onBack }) => {
   const [ingredients, setIngredients] = useState('');
@@ -89,7 +86,7 @@ const RecipeGenerator = ({ onBack }) => {
               style={{ animationDelay: `${index * 0.15}s` }}
             >
               <div className="recipe_image_container">
-                <img src={FOOD_IMAGES[index % FOOD_IMAGES.length]} alt={recipe.recipeName} />
+                <img src={getRecipeImage(recipe.name || recipe.recipeName, index)} alt={recipe.name || recipe.recipeName} />
                 <div className="recipe_time_pill">
                   ⏱ {recipe.cookingTime || '30 mins'} • 🍽 {recipe.servings || 2} servings
                 </div>
@@ -97,13 +94,15 @@ const RecipeGenerator = ({ onBack }) => {
               </div>
               
               <div className="recipe_body">
-                <h2>{recipe.recipeName}</h2>
+                <h2>{recipe.name || recipe.recipeName}</h2>
                 <p className="recipe_desc">{recipe.description}</p>
                 
-                <div className="safety_alert">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span>{recipe.safetyNote}</span>
-                </div>
+                {recipe.safetyNote && (
+                  <div className="safety_alert">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>{recipe.safetyNote}</span>
+                  </div>
+                )}
 
                 <button 
                   className="expand_toggle"
@@ -119,7 +118,7 @@ const RecipeGenerator = ({ onBack }) => {
                       <ul className="ingredient_list">
                         {recipe.ingredients && recipe.ingredients.map((ing, i) => (
                           <li key={i}>
-                            <strong>{ing.amount}</strong> <span>{ing.name}</span>
+                            {typeof ing === 'string' ? ing : `${ing.amount} ${ing.name}`}
                           </li>
                         ))}
                       </ul>
@@ -128,7 +127,7 @@ const RecipeGenerator = ({ onBack }) => {
                     <div className="recipe_section">
                       <h3>📋 Instructions</h3>
                       <ol className="step_list">
-                        {recipe.steps && recipe.steps.map((step, i) => (
+                        {(recipe.instructions || recipe.steps) && (recipe.instructions || recipe.steps).map((step, i) => (
                           <li key={i}>{step}</li>
                         ))}
                       </ol>

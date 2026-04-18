@@ -6,7 +6,7 @@ import './chat.css';
 function Chat({ onNext, t }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
-    { role: 'bot', text: t('chat_greeting') || "Hi! I'm YumZy orange 🧡 — your personal AI nutritionist. Ask me anything!" }
+    { role: 'bot', text: t('chat_greeting') || "Hi! I'm YumZy — your personal AI nutritionist. Ask me anything!" }
   ]);
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
