@@ -6,12 +6,15 @@ import mascot from './assets/mascot.png';
 function Login({ onNext, onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       alert('Please fill in email and password.');
       return;
     }
+
+    setLoading(true);
 
     try {
       // We map 'email' to 'username' as the backend expects 'username'
@@ -25,6 +28,8 @@ function Login({ onNext, onLoginSuccess }) {
       onNext('choice'); // or whatever view comes next
     } catch (error) {
       alert(error.message || 'Incorrect email or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,8 +63,13 @@ function Login({ onNext, onLoginSuccess }) {
           style={inputStyle}
         />
 
-        <button className="btn_guest" onClick={handleLogin}>
-          Log In
+        <button 
+          className="btn_guest" 
+          onClick={handleLogin}
+          disabled={loading}
+          style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+        >
+          {loading ? 'Logging In...' : 'Log In'}
         </button>
 
         <p className="footer_text">

@@ -7,6 +7,7 @@ function Signup({ onNext, onSignupSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -14,6 +15,7 @@ function Signup({ onNext, onSignupSuccess }) {
       return;
     }
 
+    setLoading(true);
     try {
       // Map email to username for the backend
       const data = await api.auth.register(email.trim(), password.trim());
@@ -26,6 +28,8 @@ function Signup({ onNext, onSignupSuccess }) {
       onNext('choice');
     } catch (error) {
       alert(error.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,8 +71,13 @@ function Signup({ onNext, onSignupSuccess }) {
           style={inputStyle}
         />
 
-        <button className="btn_guest" onClick={handleSignup}>
-          Sign Up
+        <button 
+          className="btn_guest" 
+          onClick={handleSignup} 
+          disabled={loading}
+          style={{ opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+        >
+          {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
 
         <p className="footer_text">
