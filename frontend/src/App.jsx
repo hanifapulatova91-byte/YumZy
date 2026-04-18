@@ -123,7 +123,7 @@ function App() {
       {view === 'dashboard' && (
         <Dashboard
           onNext={navigateTo}
-          userName={user?.username || 'Guest'}
+          userName={user?.name || user?.username || 'Guest'}
           t={t}
         />
       )}

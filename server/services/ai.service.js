@@ -109,18 +109,18 @@ PRODUCT CONTEXT:
 - Tags: ${(product.allergensTags || []).join(', ')}
 
 TASK:
-1. Identify EXACT words/ingredients that match or contain the user's allergens.
-2. If "safe" is false:
-   - Identify the exact offending ingredient from the product list.
-   - Suggest 2-3 SAFE FOOD ALTERNATIVES (e.g., "Rice crackers", "Oat milk", "Fruit snacks"). DO NOT suggest raw ingredients like "Coconut oil" unless specifically relevant.
-3. LANGUAGE REQUIREMENT: The "allergenFlags", "safeAlternatives", and "summary" fields MUST be in English.
+1. Identify ingredients that match or are derived from the user's allergens.
+2. IMPORTANT: Ingredients may be in ANY language (French, Dutch, German, etc.). You MUST translate them to English. For example: "soja" → "Soy", "lait" → "Milk", "blé" → "Wheat", "œufs" → "Eggs".
+3. In "allergenFlags", list the ENGLISH name of each offending allergen, followed by the original word in parentheses. Example: "Soy (soja)", "Milk (lait écrémé)".
+4. If "safe" is false, suggest 2-3 SAFE FOOD PRODUCT ALTERNATIVES that the user could buy instead. These must be complete food products (e.g., "Oat milk yogurt", "Rice crackers", "Sunflower seed butter"), NOT raw ingredients.
+5. ALL output fields MUST be in English.
 
 OUTPUT JSON ONLY:
 {
   "safe": false,
-  "allergenFlags": ["Exact Ingredient from list"],
-  "safeAlternatives": ["Specific food item alternative 1", "Specific food item alternative 2"],
-  "summary": "Clear, direct safety report in English."
+  "allergenFlags": ["Soy (soja)", "Milk (lait écrémé)"],
+  "safeAlternatives": ["Product alternative 1", "Product alternative 2"],
+  "summary": "Clear safety report in English explaining which allergens were found."
 }`;
 
       const response = await openai.chat.completions.create({
