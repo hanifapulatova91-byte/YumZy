@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const OFF_API_BASE = 'https://world.openfoodfacts.org/api/v2/product';
+const OFF_API_BASE = 'https://world.openfoodfacts.org/api/v0/product';
 
 /**
  * Fetch product data from Open Food Facts by barcode
