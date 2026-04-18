@@ -1,0 +1,104 @@
+.symptom_container {
+  min-height: 100vh;
+  background-color: #F5F5F0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem; 
+  font-family: sans-serif;
+  color: #4A6141;
+}
+
+.symptom_title {
+  font-size: 1.5rem; 
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 20px;
+}
+
+.symptom_input {
+  width: 100%;
+  max-width: 24rem; 
+  height: 10rem; 
+  padding: 1rem; 
+  border-radius: 1.5rem; 
+  background-color: #ffffff;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); 
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  transition: ring 0.2s;
+}
+
+.symptom_input:focus {
+  box-shadow: 0 0 0 2px #89A178;
+}
+
+.check_btn {
+  width: 100%;
+  max-width: 24rem; 
+  background-color: #6a8d52; 
+  color: #ffffff;
+  padding: 1rem 0; 
+  border-radius: 9999px; 
+  font-weight: 700;
+  border: none;
+  margin-top: 1.5rem; 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.check_btn:active {
+  transform: scale(0.95); 
+}
+
+.result_card {
+  margin-top: 2rem; 
+  padding: 1.5rem; 
+  background-color: #ffffff;
+  border-radius: 1.5rem; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 24rem; 
+  border-top: 4px solid #fb5f3c; 
+}
+
+.result_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result_name {
+  font-weight: 700;
+  font-size: 1.25rem; 
+  margin: 0;
+}
+
+.result_badge {
+  background-color: #ffedd5; 
+  color: #ea0c0c; 
+  padding: 0.25rem 0.75rem; 
+  border-radius: 9999px; 
+  font-weight: 700;
+  font-size: 0.75rem; 
+}
+
+.result_note {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.add_profilebtn {
+  width: 100%;
+  background-color: #e42d0db3;
+  color: #ffffff;
+  padding: 0.75rem 0; 
+  border-radius: 1rem; 
+  margin-top: 1rem; 
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}

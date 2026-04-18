@@ -1,0 +1,68 @@
+.choice_container {
+  min-height: 100vh;
+  background-color: #F5F5F0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem; 
+  font-family: sans-serif;
+  color: #4A6141;
+}
+
+.back_btn1 {
+  align-self: flex-start;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.choice_heading {
+  font-size: 1.875rem; 
+  font-weight: 700;
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.options_wrapper {
+  width: 100%;
+  max-width: 20rem; 
+  margin-top: 3rem; 
+}
+
+.options_wrapper > * + * {
+  margin-top: 1rem;
+}
+
+.card_btn {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 1.5rem; 
+  border-radius: 1.5rem; 
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
+}
+
+.hover-green:hover {
+  border-color: #89A178;
+}
+
+.hover-red:hover {
+  border-color: #c21010; 
+}
+
+.card_title {
+  font-weight: 700;
+  font-size: 1.125rem; 
+  margin: 0;
+}
+
+.card_desc {
+  font-size: 0.75rem;
+  color: #6b7280; 
+  margin-top: 0.25rem;
+}

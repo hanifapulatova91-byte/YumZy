@@ -1,0 +1,120 @@
+.grocery_page {
+  background-color: #F8FAF8;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.grocery_header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding-top: 20px;
+}
+
+.back_circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+.header_text h1 { 
+    font-size: 24px; 
+    margin: 0; 
+    color: #475e3e; 
+    font-weight: 500;
+}
+
+
+.header_text span { color: #5A7D59; 
+    font-weight: 500; 
+    font-size: 13px; }
+
+
+.grocery_card {
+  background: white;
+  padding: 20px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  opacity: 0;
+  animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.checkbox_ui {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #E0E4E0;
+  border-radius: 10px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.item_name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475e3e;
+  transition: all 0.2s;
+}
+
+
+.is_checked {
+  background: #F2F4F2;
+  border: 1px solid #E0E4E0;
+}
+
+.is_checked .checkbox_ui {
+  background: #5A7D59;
+  border-color: #5A7D59;
+}
+
+.inner_check {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.is_checked .item_name {
+  text-decoration: line-through;
+  color: #A0A8A0;
+  opacity: 0.6;
+}
+
+
+.fab_add {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: #5A7D59;
+  color: white;
+  font-size: 30px;
+  border: none;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.fab_add:hover {
+    background-color: transparent;
+    border: 1px solid #475e3e;
+    color: #475e3e;
+
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}

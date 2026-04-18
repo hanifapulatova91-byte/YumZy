@@ -1,0 +1,100 @@
+import React, { useState } from 'react';
+import { api } from './api';
+import './account.css';
+import mascot from './assets/mascot.png';
+
+function Login({ onNext, onLoginSuccess }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      alert('Please fill in email and password.');
+      return;
+    }
+
+    try {
+      // We map 'email' to 'username' as the backend expects 'username'
+      const data = await api.auth.login(email.trim(), password.trim());
+      
+      // Save token to localStorage for authenticated requests
+      localStorage.setItem('yumzy_token', data.token);
+      localStorage.setItem('yumzy_user', JSON.stringify({ name: data.username, ...data }));
+      
+      onLoginSuccess({ name: data.username, ...data });
+      onNext('choice'); // or whatever view comes next
+    } catch (error) {
+      alert(error.message || 'Incorrect email or password.');
+    }
+  };
+
+  return (
+    <div className="account_container">
+      <div className="account_header">
+        <h1 className="account_title">
+          YumZy <span className="star_icon">*</span>
+        </h1>
+        <p className="account_subtitle">Log in to continue</p>
+      </div>
+
+      <div className="image_wrapper">
+        <img src={mascot} alt="YumZy mascot" className="sloth_img" />
+      </div>
+
+      <div className="buttons">
+        <input
+          type="email"
+          placeholder="Username or Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle}
+        />
+
+        <button className="btn_guest" onClick={handleLogin}>
+          Log In
+        </button>
+
+        <p className="footer_text">
+          Don’t have an account?{' '}
+          <span
+            className="link"
+            onClick={() => onNext('signup')}
+            style={{ cursor: 'pointer' }}
+          >
+            Sign Up
+          </span>
+        </p>
+
+        <p className="footer_text">
+          <span
+            className="link"
+            onClick={() => onNext('landing')}
+            style={{ cursor: 'pointer' }}
+          >
+            Back
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const inputStyle = {
+  width: '100%',
+  padding: '14px',
+  borderRadius: '14px',
+  border: '1px solid #d9e3dd',
+  marginBottom: '12px',
+  fontSize: '15px',
+  boxSizing: 'border-box',
+};
+
+export default Login;

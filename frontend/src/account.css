@@ -1,0 +1,136 @@
+.account_container {
+  min-height: 100vh;
+  background-color: #F5F5F0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  font-family: sans-serif;
+  color: #4A6141;
+}
+
+
+.account_title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem; 
+  font-weight: 700;
+}
+
+.star_icon {
+  color: #fb923c; 
+  font-size: 1.5rem; 
+  margin-left: 0.25rem;
+}
+
+.account_subtitle {
+  margin-top: 0.870px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.19rem;
+}
+
+.image_wrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sloth_img {
+  width: 24rem;
+  height: auto;
+  filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) 
+          drop-shadow(0 8px 5px rgb(0 0 0 / 0.08)); 
+}
+
+
+
+.buttons {
+  width: 100%;
+  max-width: 20rem; 
+  margin-bottom: 2rem;
+}
+
+.btn_google, .btn_apple {
+  display: flex;          
+  align-items: center;    
+  justify-content: center;   
+  gap: 12px;         
+  width: 100%;
+  max-width: 350px;    
+  height: 55px;         
+  border-radius: 30px;      
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 15px;     
+}
+
+
+.icon {
+  width: 20px;              
+  height: 20px;
+  object-fit: contain;      
+  flex-shrink: 0;
+}
+
+.buttons > * + * {
+  margin-top: 0.75rem;
+}
+
+.btn_google {
+  background-color: white;
+  color: #000;
+  border: 1px solid #e0e0e0;
+}
+
+.btn_apple {
+  background-color: black;
+  color: white;
+  border: none;
+}
+
+.btn_guest {
+  width: 100%;
+  background-color: #89A178;
+  color: #ffffff;
+  padding: 1rem 0;
+  border-radius: 9999px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  margin-top: 1rem;
+  transition: transform 0.1s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn_guest:active {
+  transform: scale(0.95);
+}
+
+.btn_guest:hover {
+  background-color: transparent;
+  border: 1px solid #89A178;
+  color: #89A178;
+}
+
+.footer_text {
+  text-align: center;
+  color: #6b7280; 
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.link {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
