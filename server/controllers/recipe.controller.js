@@ -17,7 +17,7 @@ const createRecipe = async (req, res) => {
        profile = await Profile.findOne({ userId: req.user._id }) || { allergens: [] };
     }
 
-    const recipe = await generateRecipe(ingredients, profile, language || 'ru');
+    const recipe = await generateRecipe(ingredients, profile, language || 'en');
     res.json(recipe);
   } catch (error) {
     res.status(500).json({ message: error.message });

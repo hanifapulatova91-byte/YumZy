@@ -109,17 +109,36 @@ const generateRecipe = async (ingredients, profile, language = 'en') => {
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const prompt = `Generate 3 safe recipes using: ${ingredients.join(', ')}. Allergies: ${allergenList.join(', ')}.
-LANGUAGE: Respond in ${targetLang}.
+      const prompt = `Generate 3 allergen-safe recipes using: ${ingredients.join(', ')}. 
+ALLERGIES TO AVOID: ${allergenList.length > 0 ? allergenList.join(', ') : 'None'}.
+LANGUAGE: Response MUST be in ${targetLang}.
 
-Respond in JSON format with a "recipes" array.`;
+RESPOND WITH VALID JSON ONLY:
+{
+  "recipes": [
+    {
+      "recipeName": "Name of the dish",
+      "description": "Short appetizing description",
+      "cookingTime": "e.g. 25 mins",
+      "servings": 2,
+      "safetyNote": "Explain why this is safe regarding the allergies listed",
+      "ingredients": [
+        { "amount": "100g", "name": "Ingredient Name" }
+      ],
+      "steps": [
+        "Step 1...",
+        "Step 2..."
+      ]
+    }
+  ]
+}`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'system', content: 'You are a professional chef and nutritionist. Always return structured JSON.' }, { role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 1500,
       });
       return JSON.parse(response.choices[0].message.content);
     } catch (error) {
@@ -127,7 +146,20 @@ Respond in JSON format with a "recipes" array.`;
     }
   }
 
-  return { recipes: [{ title: "Garden Salad", description: "Healthy and safe.", instructions: "Mix veggies." }] };
+  // Fallback / Mock
+  return { 
+    recipes: [
+      { 
+        recipeName: "Chef's Garden Salad", 
+        description: "A fresh, vibrant vegetable mix perfect for any meal.", 
+        cookingTime: "10 mins",
+        servings: 1,
+        safetyNote: "Naturally free from common allergens.",
+        ingredients: [{ amount: "2 cups", name: "Mixed greens" }, { amount: "1", name: "Cucumber" }],
+        steps: ["Wash vegetables.", "Chop and mix in a bowl.", "Serve fresh."]
+      }
+    ] 
+  };
 };
 
 /**
