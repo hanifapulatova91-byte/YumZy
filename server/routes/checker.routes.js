@@ -12,7 +12,8 @@ router.post('/analyze', async (req, res) => {
       return res.status(400).json({ message: 'Symptoms description is required' });
     }
 
-    const result = await analyzeSymptoms(symptoms);
+    const language = req.headers['accept-language'] || 'en';
+    const result = await analyzeSymptoms(symptoms, language);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });

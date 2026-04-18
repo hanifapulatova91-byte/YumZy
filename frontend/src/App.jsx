@@ -15,11 +15,22 @@ import ScanResult from './scan_result';
 import Chat from './chat';
 import Profile from './profile';
 
+import { translations } from './i18n';
+
 function App() {
   const [view, setView] = useState('landing');
+  const [language, setLanguage] = useState(localStorage.getItem('yumzy_lang') || 'en');
   const [allergens, setAllergens] = useState([]);
   const [scanData, setScanData] = useState(null);
   const [user, setUser] = useState(null);
+
+  const t = (key) => translations[language][key] || key;
+
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'uz' : 'en';
+    setLanguage(newLang);
+    localStorage.setItem('yumzy_lang', newLang);
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('yumzy_user');
@@ -61,6 +72,9 @@ function App() {
         <AccApp
           onNext={navigateTo}
           user={user}
+          t={t}
+          lang={language}
+          toggleLanguage={toggleLanguage}
         />
       )}
 
@@ -82,6 +96,7 @@ function App() {
         <Choice
           onNext={(destination) => setView(destination)}
           onBack={() => setView('landing')}
+          t={t}
         />
       )}
 
@@ -89,6 +104,7 @@ function App() {
         <SymptomChecker
           onBack={() => setView('choice')}
           onAddAllergen={handleAddAllergen}
+          t={t}
         />
       )}
 
@@ -98,6 +114,7 @@ function App() {
           setAllergens={setAllergens}
           onBack={() => setView('choice')}
           onFinish={() => setView('dashboard')}
+          t={t}
         />
       )}
 
@@ -105,6 +122,9 @@ function App() {
         <Dashboard
           onNext={navigateTo}
           userName={user?.name || 'Anna'}
+          t={t}
+          lang={language}
+          toggleLanguage={toggleLanguage}
         />
       )}
 
@@ -112,6 +132,7 @@ function App() {
         <Scan
           onNext={navigateTo}
           allergens={allergens.map((a) => a.name)}
+          t={t}
         />
       )}
 
@@ -119,11 +140,15 @@ function App() {
         <ScanResult
           scanData={scanData}
           onNext={navigateTo}
+          t={t}
         />
       )}
 
       {view === 'chat' && (
-        <Chat onNext={navigateTo} />
+        <Chat 
+          onNext={navigateTo} 
+          t={t}
+        />
       )}
 
       {view === 'profile' && (
@@ -150,6 +175,7 @@ function App() {
         <Emergency
           onBack={() => setView('dashboard')}
           userAllergens={allergens}
+          t={t}
         />
       )}
     </div>

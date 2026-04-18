@@ -11,7 +11,8 @@ const scanBarcode = async (req, res) => {
       return res.status(400).json({ message: 'Barcode is required' });
     }
 
-    const result = await processScan(req.user._id, barcode);
+    const language = req.headers['accept-language'] || 'en';
+    const result = await processScan(req.user._id, barcode, language);
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });

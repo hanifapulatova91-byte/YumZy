@@ -2,14 +2,31 @@ import React from 'react';
 import './account.css';
 import mascot from './assets/mascot.png';
 
-const AccApp = ({ onNext }) => {
+const AccApp = ({ onNext, t, lang, toggleLanguage }) => {
   return (
     <div className="account_container">
+      <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
+        <button 
+          onClick={toggleLanguage}
+          style={{ 
+            background: '#f0f9f1', 
+            border: '1px solid #d9e3dd', 
+            borderRadius: '8px', 
+            padding: '6px 12px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#4a6b4c',
+            cursor: 'pointer'
+          }}
+        >
+          {lang === 'en' ? 'O\'ZB' : 'ENG'}
+        </button>
+      </div>
       <div className="account_header">
         <h1 className="account_title">
           YumZy <span className="star_icon">*</span>
         </h1>
-        <p className="account_subtitle">Smart Food Safety Assistant</p>
+        <p className="account_subtitle">{t('smart_assistant')}</p>
       </div>
 
       <div className="image_wrapper">
@@ -21,18 +38,18 @@ const AccApp = ({ onNext }) => {
           className="btn_google"
           onClick={() => onNext('login')}
         >
-          <span>Log In</span>
+          <span>{t('log_in')}</span>
         </button>
 
         <button
           className="btn_apple"
           onClick={() => onNext('signup')}
         >
-          <span>Sign Up</span>
+          <span>{t('sign_up')}</span>
         </button>
 
         <button onClick={() => onNext('choice')} className="btn_guest">
-          Continue as Guest
+          {t('continue_guest')}
         </button>
       </div>
     </div>

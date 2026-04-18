@@ -9,7 +9,7 @@ const ScanHistory = require('../models/ScanHistory.model');
  * @param {string} barcode - The scanned barcode
  * @returns {Object} Scan result with product info and safety analysis
  */
-const processScan = async (userId, barcode) => {
+const processScan = async (userId, barcode, language = 'en') => {
   // 1. Get user's allergy profile
   const profile = await Profile.findOne({ userId });
   if (!profile) {
@@ -21,14 +21,14 @@ const processScan = async (userId, barcode) => {
   if (!product) {
     return {
       found: false,
-      message: 'Продукт не найден в базе данных. Вы можете ввести состав вручную для проверки.',
+      message: language === 'uz' ? 'Mahsulot bazadan topilmadi.' : 'Product not found in database.',
       product: null,
       analysis: null
     };
   }
 
   // 3. Analyze product safety with AI
-  const analysis = await analyzeProductSafety(product, profile);
+  const analysis = await analyzeProductSafety(product, profile, language);
 
   // 4. Save to scan history
   const scanRecord = await ScanHistory.create({

@@ -11,7 +11,7 @@ import qrIcon from './assets/qr.png';
 import slothHead from './assets/aiMascot.png';
 import phoneIcon from './assets/viber.png';
 
-const Dashboard = ({ userName = "Anna", onNext }) => {
+const Dashboard = ({ userName = "Anna", onNext, t, lang, toggleLanguage }) => {
   const [activeTab, setActiveTab] = useState('home');
 
   const goTo = (tab) => {
@@ -26,9 +26,26 @@ const Dashboard = ({ userName = "Anna", onNext }) => {
   return (
     <div className="dashboard_wrapper">
       <header className="main_header">
-        <h1 className="user_greeting">Hi, {userName}!</h1>
-        <div className="avatar_circle" onClick={() => onNext('profile')}>
-          <img src={userIcon} alt="User" />
+        <h1 className="user_greeting">{t('greeting')}, {userName}!</h1>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button 
+            onClick={toggleLanguage}
+            style={{ 
+              background: '#f0f9f1', 
+              border: '1px solid #d9e3dd', 
+              borderRadius: '8px', 
+              padding: '6px 10px',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              color: '#4a6b4c',
+              cursor: 'pointer'
+            }}
+          >
+            {lang === 'en' ? 'UZ' : 'EN'}
+          </button>
+          <div className="avatar_circle" onClick={() => onNext('profile')}>
+            <img src={userIcon} alt="User" />
+          </div>
         </div>
       </header>
 
@@ -38,15 +55,15 @@ const Dashboard = ({ userName = "Anna", onNext }) => {
             <img src={barcodeIcon} alt="Scan" />
           </div>
           <div className="card_content">
-            <h3>Quick Scan</h3>
-            <p>Scan a product</p>
+            <h3>{t('scanner')}</h3>
+            <p>{t('scan_product')}</p>
           </div>
         </div>
 
         <div className="card_wide ai_bg" onClick={() => onNext('chat')}>
           <div className="card_content">
-            <h3>AI Chat</h3>
-            <p>Recipes & Diet</p>
+            <h3>{t('chat')}</h3>
+            <p>{t('recipes')} & Diet</p>
           </div>
           <img src={slothHead} alt="Sloth" className="floating_sloth" />
         </div>
@@ -55,20 +72,20 @@ const Dashboard = ({ userName = "Anna", onNext }) => {
       <div className="action_grid">
         <div className="small_card" onClick={() => onNext('recipe')}>
           <div className="small_icon_bg green_light">✨</div>
-          <span>Recipe AI</span>
+          <span>{t('recipes')}</span>
         </div>
         <div className="small_card" onClick={() => onNext('notes')}>
           <div className="small_icon_bg yellow_light"><img src={noteIcon} alt="" /></div>
-          <span>Notes & Grocery</span>
+          <span>{t('notes')}</span>
         </div>
         <div className="small_card" onClick={() => onNext('articles')}>
           <div className="small_icon_bg blue_light"><img src={qrIcon} alt="" /></div>
-          <span>Articles & Tips</span>
+          <span>{t('articles')}</span>
         </div>
       </div>
 
       <button className="sos_button" onClick={() => onNext('emergency')}>
-        <img src={phoneIcon} alt="" style={{ width: '24px' }} /> Emergency
+        <img src={phoneIcon} alt="" style={{ width: '24px' }} /> {t('emergency')}
       </button>
 
       <nav className="dock_nav">

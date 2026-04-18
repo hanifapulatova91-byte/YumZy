@@ -1,19 +1,19 @@
 import React from 'react';
 import './choice.css';
 
-const Choice = ({ onNext, onBack }) => {
+const Choice = ({ onNext, onBack, t }) => {
   return (
     <div className="choice_container">
-      <button onClick={onBack} className="back_btn1">← Back</button>
-      <h2 className="choice_heading">How can we help?</h2>
+      <button onClick={onBack} className="back_btn1">← {t('back')}</button>
+      <h2 className="choice_heading">{t('how_help')}</h2>
       <div className="options_wrapper">
         <button onClick={() => onNext('known')} className="card_btn hover-green">
-          <p className="card_title">I know my allergens</p>
-          <p className="card_desc">I have a doctor's diagnosis.</p>
+          <p className="card_title">{t('know_allergens')}</p>
+          <p className="card_desc">{t('know_desc')}</p>
         </button>
         <button onClick={() => onNext('suspect')} className="card_btn hover-red">
-          <p className="card_title">I'm not sure / Suspect</p>
-          <p className="card_desc">I want to check probabilities.</p>
+          <p className="card_title">{t('not_sure')}</p>
+          <p className="card_desc">{t('not_sure_desc')}</p>
         </button>
       </div>
     </div>

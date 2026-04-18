@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from './api';
 import { Html5Qrcode } from 'html5-qrcode';
 
-function Scan({ onNext }) {
+function Scan({ onNext, t }) {
   const [loading, setLoading] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [scannerActive, setScannerActive] = useState(false);
@@ -75,27 +75,27 @@ function Scan({ onNext }) {
           padding: '40px',
         }}
       >
-        <h1 style={{ color: '#6b946e', marginBottom: '8px' }}>Scan Product</h1>
+        <h1 style={{ color: '#6b946e', marginBottom: '8px' }}>{t('scan_product')}</h1>
         <p style={{ color: '#6b7280', lineHeight: '1.5', marginBottom: '20px' }}>
-          Use your camera to scan a barcode, or enter it manually below.
+          {t('scan_desc')}
         </p>
 
         {scannerActive ? (
           <div style={{ marginBottom: '20px' }}>
             <div id="reader" style={{ width: '100%', borderRadius: '12px', overflow: 'hidden' }}></div>
             <button onClick={() => setScannerActive(false)} style={{ ...btnSecondary, marginTop: '12px' }}>
-              Cancel Camera
+              {t('cancel_cam')}
             </button>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
             <button onClick={() => setScannerActive(true)} style={btnPrimary} disabled={loading}>
-              Open Camera
+              {t('open_cam')}
             </button>
             <div style={{ textAlign: 'center', margin: '8px 0', color: '#9ca3af' }}>OR</div>
             <input
               type="text"
-              placeholder="Enter Barcode manually"
+              placeholder={t('manual_code')}
               value={barcodeInput}
               onChange={(e) => setBarcodeInput(e.target.value)}
               style={inputStyle}
@@ -105,7 +105,7 @@ function Scan({ onNext }) {
               style={btnSecondaryLine}
               disabled={loading || !barcodeInput.trim()}
             >
-              {loading ? 'Processing...' : 'Submit Manual Code'}
+              {loading ? t('processing') : t('submit_code')}
             </button>
           </div>
         )}
@@ -114,7 +114,7 @@ function Scan({ onNext }) {
           onClick={() => onNext('dashboard')}
           style={btnSecondary}
         >
-          Back to Home
+          {t('back_home')}
         </button>
       </div>
     </div>

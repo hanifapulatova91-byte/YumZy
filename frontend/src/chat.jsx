@@ -3,10 +3,10 @@ import { api } from './api';
 import mascotImg from './assets/chatMascot.png';
 import './chat.css';
 
-function Chat({ onNext }) {
+function Chat({ onNext, t }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hi! I'm YumZy 🧡 — your personal AI nutritionist. Ask me about safe foods, meal ideas, or anything allergy-related!" }
+    { role: 'bot', text: t('chat_greeting') || "Hi! I'm YumZy orange 🧡 — your personal AI nutritionist. Ask me anything!" }
   ]);
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
@@ -47,8 +47,8 @@ function Chat({ onNext }) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </button>
         <div>
-          <h1>YumZy AI Chat</h1>
-          <p className="chat_subtitle">Your personal allergen-aware nutritionist</p>
+          <h1>{t('chat_title')}</h1>
+          <p className="chat_subtitle">{t('chat_subtitle')}</p>
         </div>
       </header>
 
@@ -75,7 +75,7 @@ function Chat({ onNext }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask YumZy something..."
+          placeholder={t('ask_yumzy')}
           rows={1}
           disabled={loading}
         />

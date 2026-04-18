@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function Emergency({ onBack, userAllergens = [] }) {
+function Emergency({ onBack, userAllergens = [], t }) {
   const [doctorNumber, setDoctorNumber] = useState('');
   const [contact1Name, setContact1Name] = useState('');
   const [contact1Number, setContact1Number] = useState('');
@@ -54,58 +54,57 @@ function Emergency({ onBack, userAllergens = [] }) {
         }}
       >
         <h1 style={{ color: '#c0392b', marginBottom: '10px' }}>
-          Emergency Help
+          {t('emergency_help')}
         </h1>
 
         <p style={{ color: '#6b7280', marginBottom: '16px', lineHeight: '1.5' }}>
-          If you are experiencing a severe allergic reaction, seek urgent medical help immediately.
+          {t('emergency_desc')}
         </p>
 
         <a
           href="tel:103"
           style={redButton}
         >
-          Call 103 Now
+          {t('call_103')}
         </a>
 
         {doctorNumber && (
           <a href={`tel:${doctorNumber}`} style={greenButton}>
-            Call Doctor ({doctorNumber})
+            {t('call_doctor')} ({doctorNumber})
           </a>
         )}
 
         {contact1Number && (
           <a href={`tel:${contact1Number}`} style={greenButton}>
-            Call {contact1Name || 'Close Contact 1'} ({contact1Number})
+            {t('call')} {contact1Name || t('contact_1')} ({contact1Number})
           </a>
         )}
 
         {contact2Number && (
           <a href={`tel:${contact2Number}`} style={greenButton}>
-            Call {contact2Name || 'Close Contact 2'} ({contact2Number})
+            {t('call')} {contact2Name || t('contact_2')} ({contact2Number})
           </a>
         )}
 
         <div style={cardRed}>
-          <strong style={{ color: '#c0392b' }}>Watch for severe symptoms</strong>
+          <strong style={{ color: '#c0392b' }}>{t('watch_symptoms')}</strong>
           <p style={{ marginTop: '8px', lineHeight: '1.6' }}>
-            Trouble breathing, swelling of lips or throat, fainting, severe dizziness,
-            repeated vomiting, or collapse.
+            {t('symptoms_list')}
           </p>
         </div>
 
         <div style={cardYellow}>
-          <strong>Immediate steps</strong>
+          <strong>{t('immediate_steps')}</strong>
           <p style={{ marginTop: '8px', lineHeight: '1.6' }}>
-            1. Stop eating the food.<br />
-            2. Use prescribed emergency medicine if available.<br />
-            3. Call 911 immediately.<br />
-            4. Stay with a trusted person until help arrives.
+            {t('step1')}<br />
+            {t('step2')}<br />
+            {t('step3')}<br />
+            {t('step4')}
           </p>
         </div>
 
         <div style={cardGray}>
-          <strong>Your Allergens</strong>
+          <strong>{t('your_allergens')}</strong>
           <div style={{ marginTop: '8px' }}>
             {userAllergens.length > 0
               ? userAllergens.map((a) => a.name || a).join(', ')

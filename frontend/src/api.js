@@ -3,8 +3,10 @@ console.log('--- YUMZY API CONNECTED TO:', API_URL);
 
 const getHeaders = () => {
   const token = localStorage.getItem('yumzy_token');
+  const lang = localStorage.getItem('yumzy_lang') || 'en';
   return {
     'Content-Type': 'application/json',
+    'Accept-Language': lang,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 };

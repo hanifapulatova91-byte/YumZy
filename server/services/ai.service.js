@@ -18,19 +18,25 @@ const ALLERGEN_DERIVATIVES = {
 };
 
 /**
- * Analyze product safety for a user's allergy profile
- * @param {Object} product - Product data from Open Food Facts
- * @param {Object} profile - User's allergy profile
- * @returns {Object} { safe: boolean, allergenFlags: string[], summary: string }
+ * Map language codes to full names for AI prompts
  */
-const analyzeProductSafety = async (product, profile) => {
+const LANG_MAP = {
+  en: 'English',
+  uz: 'Uzbek (Cyrillic or Latin as appropriate, usually Latin for modern mobile users)',
+};
+
+/**
+ * Analyze product safety for a user's allergy profile
+ */
+const analyzeProductSafety = async (product, profile, language = 'en') => {
   const allergenList = [...(profile.allergens || []), ...(profile.customAllergens || [])];
+  const targetLang = LANG_MAP[language] || 'English';
 
   if (allergenList.length === 0) {
     return {
       safe: true,
       allergenFlags: [],
-      summary: 'No allergens configured in your profile. Product is considered safe by default.',
+      summary: language === 'uz' ? 'Profilingizda allergenlar ko\'rsatilmagan.' : 'No allergens configured in your profile.',
     };
   }
 
@@ -56,49 +62,36 @@ const analyzeProductSafety = async (product, profile) => {
       safe: !isMockUnsafe,
       allergenFlags: flaggedAllergens,
       summary: isMockUnsafe 
-        ? `[SAFETY MODE] Critical: This product contains ${flaggedAllergens.join(' and ')}. Do not consume.` 
-        : `[SAFETY MODE] No direct matches for your allergens found. However, please always double-check the label.`
+        ? `[SAFETY MODE] Critical: This product contains ${flaggedAllergens.join(' and ')}.` 
+        : `[SAFETY MODE] No direct matches for your allergens found.`
     };
   };
 
-  // 1. TRY REAL AI ANALYSIS
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const prompt = `You are an expert nutritionist and allergen specialist. Analyze the following product ingredients for potential allergens.
+      const prompt = `You are an expert nutritionist. Analyze ingredients for potential allergens.
+LANGUAGE: Respond in ${targetLang}.
 
-USER'S ALLERGENS: ${allergenList.join(', ')}
+USER ALLERGENS: ${allergenList.join(', ')}
+PRODUCT: ${product.productName}
+INGREDIENTS: ${product.ingredientsText || 'None'}
 
-PRODUCT NAME: ${product.productName}
-PRODUCT BRAND: ${product.productBrand}
-INGREDIENTS: ${product.ingredientsText || 'No ingredients listed'}
-KNOWN ALLERGEN TAGS: ${product.allergensTags?.join(', ') || 'None'}
-
-IMPORTANT: Be thorough. Check for hidden allergens, derivatives, and cross-contamination risks.
-
-Respond ONLY with valid JSON in this exact format:
+Respond in JSON ONLY:
 {
   "safe": true/false,
-  "allergenFlags": ["allergen1", "allergen2"],
-  "summary": "Brief explanation in 1-2 sentences about why the product is safe or dangerous for this user."
+  "allergenFlags": ["allergen1"],
+  "summary": "Brief explanation in the target language."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a food allergen analysis expert. Always respond with valid JSON only.' },
-          { role: 'user', content: prompt },
-        ],
+        messages: [{ role: 'system', content: 'You are an allergen expert. Respond with valid JSON only.' }, { role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
         temperature: 0.2,
         max_tokens: 300,
       });
 
-      const result = JSON.parse(response.choices[0].message.content);
-      return {
-        safe: result.safe ?? true,
-        allergenFlags: result.allergenFlags || [],
-        summary: result.summary || '',
-      };
+      return JSON.parse(response.choices[0].message.content);
     } catch (error) {
       console.error('DEBUG: OpenAI Analysis Error:', error.message);
     }
@@ -108,26 +101,18 @@ Respond ONLY with valid JSON in this exact format:
 };
 
 /**
- * Generate a safe recipe based on available ingredients and user's allergen profile
+ * Generate a safe recipe
  */
-const generateRecipe = async (ingredients, profile, language = 'ru') => {
+const generateRecipe = async (ingredients, profile, language = 'en') => {
   const allergenList = [...(profile.allergens || []), ...(profile.customAllergens || [])];
-
-  const getMockRecipe = () => {
-    return [
-      {
-        title: "Safe Garden Salad",
-        description: "A fresh and safe salad tailored to your profile.",
-        ingredients: ["Lettuce", "Tomato", "Cucumber", "Olive Oil"],
-        instructions: "Mix all ingredients in a bowl and serve."
-      }
-    ];
-  };
+  const targetLang = LANG_MAP[language] || 'English';
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const langMap = { en: 'English', ru: 'Russian', uz: 'Uzbek' };
-      const prompt = `Generate 3 safe recipes using: ${ingredients.join(', ')}. Allergies: ${allergenList.join(', ')}. Language: ${langMap[language] || 'Russian'}`;
+      const prompt = `Generate 3 safe recipes using: ${ingredients.join(', ')}. Allergies: ${allergenList.join(', ')}.
+LANGUAGE: Respond in ${targetLang}.
+
+Respond in JSON format with a "recipes" array.`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -142,30 +127,22 @@ const generateRecipe = async (ingredients, profile, language = 'ru') => {
     }
   }
 
-  return getMockRecipe();
+  return { recipes: [{ title: "Garden Salad", description: "Healthy and safe.", instructions: "Mix veggies." }] };
 };
 
 /**
  * Chat with the AI nutritionist agent
  */
-const chatWithAI = async (message, profile) => {
+const chatWithAI = async (message, profile, language = 'en') => {
   const allergenList = [...(profile?.allergens || []), ...(profile?.customAllergens || [])];
-
-  const getMockChat = () => {
-    if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
-      return { reply: "[SAFETY MODE] Hello! I'm YumZy. I am currently running on limited brain power, but I am still watching over your safety!" };
-    }
-    return {
-      reply: "I am currently analyzing your question based on my nutritionist-backed data. I have noticed you are allergic to " + (allergenList.join(', ') || 'nothing yet') + ". How can I assist you with your safe shopping journey?"
-    };
-  };
+  const targetLang = LANG_MAP[language] || 'English';
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: `You are YumZy, a friendly mascot and expert nutritionist. Allergens: ${allergenList.join(', ') || 'None'}.` },
+          { role: 'system', content: `You are YumZy, a friendly mascot. Always respond in ${targetLang}. User Allergens: ${allergenList.join(', ')}.` },
           { role: 'user', content: message },
         ],
         temperature: 0.7,
@@ -174,50 +151,44 @@ const chatWithAI = async (message, profile) => {
       return { reply: response.choices[0].message.content };
     } catch (error) {
       console.error('DEBUG: OpenAI Chat Error:', error.message);
-      return getMockChat();
     }
   }
 
-  return getMockChat();
+  return { reply: language === 'uz' ? "[SAFETY MODE] Men hozircha cheklangan rejimda ishlayapman." : "[SAFETY MODE] I am running on limited capacity." };
 };
 
 /**
- * Analyze symptoms to find the most likely allergen
+ * Analyze symptoms
  */
-const analyzeSymptoms = async (symptoms) => {
-  const getMockProb = () => ({
-    name: 'Dairy',
-    percent: 'Unknown',
-    note: 'In Safety Mode, I suspect common allergens. Please verify with a doctor.'
-  });
+const analyzeSymptoms = async (symptoms, language = 'en') => {
+  const targetLang = LANG_MAP[language] || 'English';
 
-  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('your-openai-key')) {
-    return getMockProb();
-  }
+  if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
+    try {
+      const prompt = `Analyze symptoms: ${symptoms}. Identify likely allergen.
+LANGUAGE: Respond in ${targetLang}.
 
-  try {
-    const prompt = `Analyze these symptoms and identify the most likely food allergen.
-SYMPTOMS: ${symptoms}
-
-Respond ONLY with valid JSON:
+Respond in JSON:
 {
-  "name": "Allergen Name",
-  "percent": "Probability %",
-  "note": "Brief explanation why (1 sentence)"
+  "name": "Allergen",
+  "percent": "%",
+  "note": "Explanation in ${targetLang}"
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-    });
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.3,
+      });
 
-    return JSON.parse(response.choices[0].message.content);
-  } catch (error) {
-    console.error('DEBUG: Symptom Analysis Error:', error.message);
-    return getMockProb();
+      return JSON.parse(response.choices[0].message.content);
+    } catch (error) {
+      console.error('DEBUG: Symptom Analysis Error:', error.message);
+    }
   }
+
+  return { name: 'Dairy', percent: 'Unknown', note: 'Please see a doctor.' };
 };
 
 module.exports = {
