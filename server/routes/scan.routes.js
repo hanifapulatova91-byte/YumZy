@@ -3,7 +3,7 @@ const router = express.Router();
 const { scanBarcode, getScanHistory } = require('../controllers/scan.controller');
 const { protect } = require('../middleware/auth.middleware');
 
-router.post('/', protect, scanBarcode);
+router.post('/', scanBarcode);
 router.get('/history', protect, getScanHistory);
 
 module.exports = router;

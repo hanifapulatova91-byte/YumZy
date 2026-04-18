@@ -3,6 +3,6 @@ const router = express.Router();
 const { createRecipe } = require('../controllers/recipe.controller');
 const { protect } = require('../middleware/auth.middleware');
 
-router.post('/generate', protect, createRecipe);
+router.post('/generate', createRecipe);
 
 module.exports = router;
