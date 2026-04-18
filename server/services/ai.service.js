@@ -101,11 +101,9 @@ Respond ONLY with valid JSON in this exact format:
       };
     } catch (error) {
       console.error('DEBUG: OpenAI Analysis Error:', error.message);
-      // Fallback to mock if API fails
     }
   }
 
-  // FALLBACK TO LOCAL SAFETY MODE
   return getMockSafety();
 };
 
@@ -164,20 +162,23 @@ const chatWithAI = async (message, profile) => {
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: `You are YumZy, a friendly mascot and expert nutritionist. Allergens: ${allergenList.join(', ') || 'None'}.` },
-        { role: 'user', content: message },
-      ],
-      temperature: 0.7,
-      max_tokens: 500,
-    });
-    return { reply: response.choices[0].message.content };
-  } catch (error) {
-    console.error('DEBUG: OpenAI Chat Error:', error.message);
-    return getMockChat();
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: `You are YumZy, a friendly mascot and expert nutritionist. Allergens: ${allergenList.join(', ') || 'None'}.` },
+          { role: 'user', content: message },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      });
+      return { reply: response.choices[0].message.content };
+    } catch (error) {
+      console.error('DEBUG: OpenAI Chat Error:', error.message);
+      return getMockChat();
+    }
   }
+
+  return getMockChat();
 };
 
 /**
