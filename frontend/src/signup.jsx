@@ -21,14 +21,13 @@ function Signup({ onNext, onSignupSuccess, t }) {
 
     setLoading(true);
     try {
-      // Map email to username for the backend
-      const data = await api.auth.register(cleanEmail, cleanPassword);
+      const data = await api.auth.register(cleanEmail, cleanPassword, cleanName);
       
       // Save token
       localStorage.setItem('yumzy_token', data.token);
-      localStorage.setItem('yumzy_user', JSON.stringify({ name: cleanName, ...data }));
+      localStorage.setItem('yumzy_user', JSON.stringify(data));
       
-      onSignupSuccess({ name: cleanName, ...data });
+      onSignupSuccess(data);
       onNext('choice');
     } catch (error) {
       alert(error.message || 'Registration failed');

@@ -20,15 +20,25 @@ function Login({ onNext, onLoginSuccess, t }) {
     setLoading(true);
 
     try {
-      // We map 'email' to 'username' as the backend expects 'username'
       const data = await api.auth.login(cleanEmail, cleanPassword);
       
       // Save token to localStorage for authenticated requests
       localStorage.setItem('yumzy_token', data.token);
-      localStorage.setItem('yumzy_user', JSON.stringify({ name: data.username, ...data }));
+      localStorage.setItem('yumzy_user', JSON.stringify(data));
       
-      onLoginSuccess({ name: data.username, ...data });
-      onNext('choice'); // or whatever view comes next
+      onLoginSuccess(data);
+      
+      // Check if user already has allergens saved — skip setup if so
+      try {
+        const profile = await api.profile.getProfile();
+        if (profile && profile.allergens && profile.allergens.length > 0) {
+          onNext('dashboard');
+        } else {
+          onNext('choice');
+        }
+      } catch {
+        onNext('choice');
+      }
     } catch (error) {
       alert(error.message || t('incorrect_credentials'));
     } finally {

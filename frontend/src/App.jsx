@@ -15,6 +15,7 @@ import ScanResult from './scan_result';
 import Chat from './chat';
 import Profile from './profile';
 
+import { api } from './api';
 import { translations } from './i18n';
 
 function App() {
@@ -25,12 +26,26 @@ function App() {
 
   const t = (key) => translations['en'][key] || key;
 
+  // On app load: restore user session and fetch saved allergens
   useEffect(() => {
     const savedUser = localStorage.getItem('yumzy_user');
     const savedToken = localStorage.getItem('yumzy_token');
     if (savedUser && savedToken) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
+        
+        // Fetch profile from server to load saved allergens
+        api.profile.getProfile().then(profile => {
+          if (profile && profile.allergens && profile.allergens.length > 0) {
+            // Convert string allergens to objects with severity
+            const loaded = profile.allergens.map(a => ({ name: a, severity: 'MODERATE' }));
+            setAllergens(loaded);
+            setView('dashboard');
+          }
+        }).catch(() => {
+          // Profile fetch failed, user can still proceed manually
+        });
       } catch {
         setUser(null);
       }
@@ -81,7 +96,16 @@ function App() {
       {view === 'login' && (
         <Login
           onNext={navigateTo}
-          onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
+          onLoginSuccess={(loggedInUser) => {
+            setUser(loggedInUser);
+            // Load saved allergens from server
+            api.profile.getProfile().then(profile => {
+              if (profile && profile.allergens && profile.allergens.length > 0) {
+                const loaded = profile.allergens.map(a => ({ name: a, severity: 'MODERATE' }));
+                setAllergens(loaded);
+              }
+            }).catch(() => {});
+          }}
           t={t}
         />
       )}

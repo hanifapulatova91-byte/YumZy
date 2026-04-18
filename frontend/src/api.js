@@ -25,11 +25,11 @@ export const api = {
       }
       return res.json();
     },
-    register: async (username, password) => {
+    register: async (username, password, name) => {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, name }),
       });
       if (!res.ok) {
         const error = await res.json();
@@ -46,6 +46,13 @@ export const api = {
     },
   },
   profile: {
+    getProfile: async () => {
+      const res = await fetch(`${API_URL}/profile`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) return null;
+      return res.json();
+    },
     saveQuiz: async (payload) => {
       const res = await fetch(`${API_URL}/profile/quiz`, {
         method: 'POST',

@@ -12,8 +12,9 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 const register = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, name } = req.body;
     const cleanUsername = username ? username.trim().toLowerCase() : '';
+    const cleanName = name ? name.trim() : '';
 
     if (!username || !password) {
       return res.status(400).json({ message: 'Please provide username and password' });
@@ -27,6 +28,7 @@ const register = async (req, res) => {
 
     // Create user
     const user = await User.create({
+      name: cleanName,
       username: cleanUsername,
       password,
     });
@@ -36,6 +38,7 @@ const register = async (req, res) => {
 
     res.status(201).json({
       _id: user._id,
+      name: user.name,
       username: user.username,
       quizCompleted: user.quizCompleted,
       token: generateToken(user._id),
@@ -74,6 +77,7 @@ const login = async (req, res) => {
 
     res.json({
       _id: user._id,
+      name: user.name,
       username: user.username,
       quizCompleted: user.quizCompleted,
       token: generateToken(user._id),
@@ -90,6 +94,7 @@ const getMe = async (req, res) => {
     const user = await User.findById(req.user._id);
     res.json({
       _id: user._id,
+      name: user.name,
       username: user.username,
       quizCompleted: user.quizCompleted,
     });
