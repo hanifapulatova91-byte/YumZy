@@ -99,4 +99,18 @@ export const api = {
       return res.json();
     },
   },
+  checker: {
+    analyze: async (symptoms) => {
+      const res = await fetch(`${API_URL}/checker/analyze`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ symptoms }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Analysis failed');
+      }
+      return res.json();
+    },
+  },
 };

@@ -29,6 +29,7 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/profile', require('./routes/profile.routes'));
 app.use('/api/scan', require('./routes/scan.routes'));
 app.use('/api/recipes', require('./routes/recipe.routes'));
+app.use('/api/checker', require('./routes/checker.routes'));
 app.use('/api/chat', require('./routes/chat.routes'));
 
 // Health check

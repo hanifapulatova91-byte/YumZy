@@ -4,9 +4,22 @@ import './checker.css';
 const SymptomChecker = ({ onBack, onAddAllergen }) => {
   const [symptoms, setSymptoms] = useState('');
   const [probability, setProbability] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const checkProb = () => {
-    setProbability({ name: "Dairy", percent: "75%", note: "Symptoms often follow lactose intake." });
+  const checkProb = async () => {
+    if (!symptoms.trim()) {
+      alert('Please describe your symptoms first.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await api.checker.analyze(symptoms);
+      setProbability(result);
+    } catch (error) {
+      alert(error.message || 'Error analyzing symptoms');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -19,7 +32,9 @@ const SymptomChecker = ({ onBack, onAddAllergen }) => {
         value={symptoms}
         onChange={(e) => setSymptoms(e.target.value)}
       />
-      <button onClick={checkProb} className="check_btn">Check Probability</button>
+      <button onClick={checkProb} className="check_btn" disabled={loading}>
+        {loading ? 'Analyzing...' : 'Check Probability'}
+      </button>
 
       {probability && (
         <div className="result_card">

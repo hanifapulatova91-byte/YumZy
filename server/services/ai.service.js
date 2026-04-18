@@ -164,26 +164,64 @@ const chatWithAI = async (message, profile) => {
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: `You are YumZy, a friendly mascot and expert nutritionist. Allergens: ${allergenList.join(', ') || 'None'}.` },
-          { role: 'user', content: message },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      });
-      return { reply: response.choices[0].message.content };
-    } catch (error) {
-      console.error('DEBUG: OpenAI Chat Error:', error.message);
-    }
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: `You are YumZy, a friendly mascot and expert nutritionist. Allergens: ${allergenList.join(', ') || 'None'}.` },
+        { role: 'user', content: message },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+    return { reply: response.choices[0].message.content };
+  } catch (error) {
+    console.error('DEBUG: OpenAI Chat Error:', error.message);
+    return getMockChat();
+  }
+};
+
+/**
+ * Analyze symptoms to find the most likely allergen
+ */
+const analyzeSymptoms = async (symptoms) => {
+  const getMockProb = () => ({
+    name: 'Dairy',
+    percent: 'Unknown',
+    note: 'In Safety Mode, I suspect common allergens. Please verify with a doctor.'
+  });
+
+  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('your-openai-key')) {
+    return getMockProb();
   }
 
-  return getMockChat();
+  try {
+    const prompt = `Analyze these symptoms and identify the most likely food allergen.
+SYMPTOMS: ${symptoms}
+
+Respond ONLY with valid JSON:
+{
+  "name": "Allergen Name",
+  "percent": "Probability %",
+  "note": "Brief explanation why (1 sentence)"
+}`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' },
+      temperature: 0.3,
+    });
+
+    return JSON.parse(response.choices[0].message.content);
+  } catch (error) {
+    console.error('DEBUG: Symptom Analysis Error:', error.message);
+    return getMockProb();
+  }
 };
 
 module.exports = {
   analyzeProductSafety,
   generateRecipe,
   chatWithAI,
+  analyzeSymptoms,
 };
