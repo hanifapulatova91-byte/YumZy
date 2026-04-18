@@ -19,6 +19,10 @@ import { translations } from './i18n';
 
 function App() {
   const [view, setView] = useState('landing');
+  const [allergens, setAllergens] = useState([]);
+  const [scanData, setScanData] = useState(null);
+  const [user, setUser] = useState(null);
+
   const t = (key) => translations['en'][key] || key;
 
   useEffect(() => {
