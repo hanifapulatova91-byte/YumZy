@@ -97,42 +97,36 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
 
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
-      const prompt = `Act as an UNCOMPROMISING Allergen Safety Engine. 
+      const prompt = `You are a precise Allergen Safety Analyzer.
 
-USER DATA:
-- Allergens to block: ${allergenList.join(', ')}
-- Goal: 100% User Safety.
+USER ALLERGENS: ${allergenList.join(', ')}
 
-PRODUCT CONTEXT:
+PRODUCT:
 - Name: ${product.productName}
 - Brand: ${product.productBrand || 'Unknown'}
 - Ingredients: ${product.ingredientsText || 'NOT LISTED'}
-- Tags: ${(product.allergensTags || []).join(', ')}
+- Allergen Tags: ${(product.allergensTags || []).join(', ')}
 
-TASK:
-1. Identify ingredients that match or are derived from the user's allergens.
-2. IMPORTANT: Ingredients may be in ANY language (French, Dutch, German, etc.). You MUST translate them to English. For example: "soja" → "Soy", "lait" → "Milk", "blé" → "Wheat", "œufs" → "Eggs".
-3. In "allergenFlags", list the ENGLISH name of each offending allergen, followed by the original word in parentheses. Example: "Soy (soja)", "Milk (lait écrémé)".
-4. SAFE ALTERNATIVES RULES (very important):
-   - First, identify the PRODUCT CATEGORY (e.g., cookies, milk, chocolate bar, pasta, bread, yogurt, cereal, etc.).
-   - Then suggest 2-3 alternatives that are the SAME TYPE of product but FREE of the user's allergens.
-   - Example: If the product is "Chocolate Cookies" and the user is allergic to Dairy → suggest "Dairy-free chocolate cookies", "Oreo Thins (dairy-free varieties)", "Enjoy Life double chocolate cookies".
-   - Example: If the product is "Milk" and the user is allergic to Dairy → suggest "Oat milk", "Almond milk", "Coconut milk".
-   - NEVER suggest random ingredients like "coconut oil" or "rice flour". Always suggest COMPLETE, buyable food products of the same category.
-5. ALL output fields MUST be in English.
+RULES:
+1. ONLY flag allergens that are ACTUALLY PRESENT in the "Ingredients" or "Allergen Tags" fields above. Do NOT guess or assume.
+2. If an allergen is NOT mentioned anywhere in the ingredients or tags, it is NOT present. Do NOT hallucinate.
+3. Ingredients may be in any language. Translate to English. Format: "English Name (original word)". Example: "Soy (soja)".
+4. If "safe" is false, suggest 2-3 safe alternatives of the SAME product type (e.g., chocolate → dairy-free chocolate, not "coconut oil").
+5. If ingredients say "NOT LISTED", mark safe as false with summary "Ingredients not available - cannot verify safety."
+6. Respond in English only.
 
-OUTPUT JSON ONLY:
+JSON OUTPUT:
 {
-  "safe": false,
-  "allergenFlags": ["Soy (soja)", "Milk (lait écrémé)"],
-  "safeAlternatives": ["Allergen-free version of same product type 1", "Allergen-free version 2"],
-  "summary": "Clear safety report in English explaining which allergens were found."
+  "safe": true or false,
+  "allergenFlags": ["only items actually found in ingredients"],
+  "safeAlternatives": ["same-category allergen-free products"],
+  "summary": "Evidence-based safety report."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a zero-tolerance allergen engine. You respond in English JSON only.' },
+          { role: 'system', content: 'You are a factual allergen analyzer. You ONLY report allergens that are explicitly listed in the provided ingredients or tags. You NEVER invent, assume, or hallucinate allergens. Respond in English JSON only.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },
