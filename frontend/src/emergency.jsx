@@ -17,7 +17,7 @@ function Emergency({ onBack, userAllergens = [] }) {
         setContact1Number(data.contact1Number || '');
         setContact2Name(data.contact2Name || '');
         setContact2Number(data.contact2Number || '');
-      } catch {}
+      } catch { }
     }
   }, []);
 
@@ -62,10 +62,10 @@ function Emergency({ onBack, userAllergens = [] }) {
         </p>
 
         <a
-          href="tel:911"
+          href="tel:103"
           style={redButton}
         >
-          Call 911 Now
+          Call 103 Now
         </a>
 
         {doctorNumber && (

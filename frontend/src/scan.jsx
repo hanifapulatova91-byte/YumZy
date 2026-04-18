@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from './api';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 function Scan({ onNext }) {
   const [loading, setLoading] = useState(false);
@@ -8,30 +8,39 @@ function Scan({ onNext }) {
   const [scannerActive, setScannerActive] = useState(false);
 
   useEffect(() => {
-    let scanner = null;
+    let html5QrCode = null;
 
     if (scannerActive) {
-      scanner = new Html5QrcodeScanner(
-        'reader',
-        { fps: 10, qrbox: { width: 250, height: 150 } },
-        /* verbose= */ false
-      );
+      html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 20, qrbox: { width: 280, height: 180 } };
 
-      scanner.render(
-        (decodedText) => {
-          scanner.clear();
+      const startScanner = async () => {
+        try {
+          // Prefer back camera (environment facing)
+          await html5QrCode.start(
+            { facingMode: "environment" }, 
+            config,
+            (decodedText) => {
+              html5QrCode.stop().then(() => {
+                setScannerActive(false);
+                checkProduct(decodedText);
+              });
+            },
+            () => {} // Ignored
+          );
+        } catch (err) {
+          console.error("Camera failed:", err);
+          alert("Could not access camera. Please ensure permissions are granted.");
           setScannerActive(false);
-          checkProduct(decodedText);
-        },
-        (err) => {
-          // ignore scan errors (they happen very frequently while looking for a barcode)
         }
-      );
+      };
+
+      startScanner();
     }
 
     return () => {
-      if (scanner) {
-        scanner.clear().catch(e => console.error('Failed to clear scanner', e));
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(e => console.error('Failed to stop scanner', e));
       }
     };
   }, [scannerActive]);
