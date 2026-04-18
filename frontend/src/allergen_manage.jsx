@@ -3,10 +3,11 @@ import { api } from './api';
 import './allergen_manage.css';
 import Dashboard from './home_screen';
 
-const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
+const AllergenManager = ({ allergens, setAllergens, onBack, onFinish, t }) => {
   const [inputValue, setInputValue] = useState('');
   const commonSuggestions = ["Peanuts", "Soy", "Seafood", "Dairy", "Fish", "Gluten"];
 
+  // Logic remains the same...
   const addAllergen = (name) => {
     if (!name) return;
     if (!allergens.find(a => a.name.toLowerCase() === name.toLowerCase())) {
@@ -29,10 +30,7 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
 
   const handleFinishClick = async () => {
     setIsExploding(true);
-
     try {
-      // Just pass the allergens directly, or map to names. 
-      // The backend accepts an array. 
       await api.profile.saveQuiz({ 
         quizAnswers: {}, 
         allergens: allergens.map(a => a.name)
@@ -40,25 +38,21 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
     } catch (e) {
       console.error('Failed to save profile:', e);
     }
-
     setTimeout(() => {
       onFinish(); 
-      }, 350);
+    }, 350);
   };
-
-
-
 
   return (
     <div className={`manager_cont ${isExploding ? 'page-exit' : ''}`}>
-      <button onClick={onBack} className="back_btn1">← Back</button>
+      <button onClick={onBack} className="back_btn1">← {t('back')}</button>
       
-      <h2 className="manager_title">Your Allergens</h2>
+      <h2 className="manager_title">{t('manager_title')}</h2>
       
       <div className="input_group">
         <input 
           className="text_input" 
-          placeholder="Add new (e.g. Walnuts)" 
+          placeholder={t('add_new')} 
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
@@ -66,7 +60,7 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
       </div>
 
       <div className="sug_sec">
-        <p className="sec_label">Common Suspects</p>
+        <p className="sec_label">{t('common_suspects')}</p>
         <div className="pill_cont">
           {commonSuggestions.map((item) => (
             <button 
@@ -94,7 +88,7 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
                   onClick={() => updateSeverity(i, lvl)}
                   className={`sev_btn ${a.severity === lvl ? 'active' : ''}`}
                 >
-                  {lvl}
+                  {t(lvl.toLowerCase())}
                 </button>
               ))}
             </div>
@@ -102,10 +96,14 @@ const AllergenManager = ({ allergens, setAllergens, onBack, onFinish }) => {
         ))}
       </div>
 
-        {allergens.length > 0 && (
-          <button onClick={(handleFinishClick)} className={`finish_btn ${isExploding ? 'exploding' : ''}`}> Save and Finish
-          </button>
-        )}
+      {allergens.length > 0 && (
+        <button onClick={handleFinishClick} className={`finish_btn ${isExploding ? 'exploding' : ''}`}> 
+          {t('save_finish')}
+        </button>
+      )}
+    </div>
+  );
+};
 
     </div>
   );

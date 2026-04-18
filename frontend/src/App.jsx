@@ -82,6 +82,7 @@ function App() {
         <Login
           onNext={navigateTo}
           onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
+          t={t}
         />
       )}
 
@@ -89,6 +90,7 @@ function App() {
         <Signup
           onNext={navigateTo}
           onSignupSuccess={(newUser) => setUser(newUser)}
+          t={t}
         />
       )}
 
@@ -156,19 +158,20 @@ function App() {
           user={user}
           allergens={allergens}
           onNext={navigateTo}
+          t={t}
         />
       )}
 
       {view === 'recipe' && (
-        <RecipeGenerator onBack={() => setView('dashboard')} />
+        <RecipeGenerator onBack={() => setView('dashboard')} t={t} />
       )}
 
       {view === 'notes' && (
-        <Notes onBack={() => setView('dashboard')} />
+        <Notes onBack={() => setView('dashboard')} t={t} />
       )}
 
       {view === 'articles' && (
-        <Articles onBack={() => setView('dashboard')} />
+        <Articles onBack={() => setView('dashboard')} t={t} />
       )}
 
       {view === 'emergency' && (

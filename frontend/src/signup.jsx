@@ -3,7 +3,7 @@ import { api } from './api';
 import './account.css';
 import mascot from './assets/mascot.png';
 
-function Signup({ onNext, onSignupSuccess }) {
+function Signup({ onNext, onSignupSuccess, t }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,7 +11,7 @@ function Signup({ onNext, onSignupSuccess }) {
 
   const handleSignup = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
-      alert('Please fill in your name, email, and password.');
+      alert(t('fill_fields'));
       return;
     }
 
@@ -39,7 +39,7 @@ function Signup({ onNext, onSignupSuccess }) {
         <h1 className="account_title">
           YumZy <span className="star_icon">*</span>
         </h1>
-        <p className="account_subtitle">Create your account</p>
+        <p className="account_subtitle">{t('sign_up')}</p>
       </div>
 
       <div className="image_wrapper">
@@ -49,7 +49,7 @@ function Signup({ onNext, onSignupSuccess }) {
       <div className="buttons">
         <input
           type="text"
-          placeholder="Full Name"
+          placeholder={t('name_label')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={inputStyle}
@@ -57,7 +57,7 @@ function Signup({ onNext, onSignupSuccess }) {
 
         <input
           type="email"
-          placeholder="Username or Email"
+          placeholder={t('email_label')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}
@@ -87,7 +87,7 @@ function Signup({ onNext, onSignupSuccess }) {
             onClick={() => onNext('login')}
             style={{ cursor: 'pointer' }}
           >
-            Log In
+            {t('log_in')}
           </span>
         </p>
 
@@ -97,7 +97,7 @@ function Signup({ onNext, onSignupSuccess }) {
             onClick={() => onNext('landing')}
             style={{ cursor: 'pointer' }}
           >
-            Back
+            {t('back')}
           </span>
         </p>
       </div>

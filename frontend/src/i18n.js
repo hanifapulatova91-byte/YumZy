@@ -6,6 +6,13 @@ export const translations = {
     sign_up: "Sign Up",
     continue_guest: "Continue as Guest",
     
+    // Auth
+    creating_account: "Creating Account...",
+    logging_in: "Logging In...",
+    fill_fields: "Please fill in all fields.",
+    already_exists: "Account already exists. Please log in!",
+    incorrect_credentials: "Incorrect email or password.",
+    
     // Choice Screen
     how_help: "How can we help?",
     know_allergens: "I know my allergens",
@@ -13,6 +20,25 @@ export const translations = {
     not_sure: "I'm not sure / Suspect",
     not_sure_desc: "I want to check probabilities.",
     back: "Back",
+    
+    // Allergen Manager
+    manager_title: "Your Allergens",
+    add_new: "Add new (e.g. Walnuts)",
+    common_suspects: "Common Suspects",
+    save_finish: "Save and Finish",
+    moderate: "Moderate",
+    medium: "Medium",
+    severe: "Severe",
+    
+    // Profile
+    profile_title: "My Profile",
+    profile_desc: "Your account and allergy details.",
+    name_label: "Name",
+    email_label: "Email",
+    allergens_label: "Allergens",
+    edit_allergens: "Edit Allergens",
+    not_set: "Not set",
+    no_allergens_saved: "No allergens saved yet.",
     
     // Home Screen
     greeting: "Hello",
@@ -33,6 +59,21 @@ export const translations = {
     submit_code: "Submit Manual Code",
     back_home: "Back to Home",
     processing: "Processing...",
+    
+    // Scan Result
+    scan_result_title: "Scan Result",
+    safe: "SAFE",
+    dangerous: "DANGEROUS",
+    ingredients: "Ingredients",
+    allergen_flags: "Allergen Flags",
+    not_found: "Product Not Found",
+    scan_another: "Scan Another Product",
+    none: "None",
+    not_listed: "Not listed",
+    no_matched_allergens: "No matched allergens were detected.",
+    product_contains_allergens: "This product contains allergens.",
+    product_not_loaded: "Product couldn't be loaded.",
+    no_scan_result: "No scan result found.",
     
     // Symptom Checker
     checker_title: "Symptom Checker",
@@ -70,6 +111,7 @@ export const translations = {
     loading: "Loading...",
     save: "Save",
     finish: "Finish",
+    go_back: "Go Back",
   },
   uz: {
     // Landing
@@ -77,6 +119,13 @@ export const translations = {
     log_in: "Kirish",
     sign_up: "Ro'yxatdan o'tish",
     continue_guest: "Mehmon sifatida davom etish",
+
+    // Auth
+    creating_account: "Hisob yaratilmoqda...",
+    logging_in: "Kirilmoqda...",
+    fill_fields: "Iltimos, hamma maydonlarni to'ldiring.",
+    already_exists: "Bu hisob allaqachon mavjud. Kirish tugmasini bosing!",
+    incorrect_credentials: "Email yoki parol noto'g'ri.",
     
     // Choice Screen
     how_help: "Sizga qanday yordam bera olamiz?",
@@ -85,6 +134,25 @@ export const translations = {
     not_sure: "Ishonchim komil emas",
     not_sure_desc: "Ehtimollikni tekshirmoqchiman.",
     back: "Orqaga",
+
+    // Allergen Manager
+    manager_title: "Sizning allergenlaringiz",
+    add_new: "Yangi qo'shish (masalan: Yong'oq)",
+    common_suspects: "Ko'p uchraydiganlar",
+    save_finish: "Saqlash va tugatish",
+    moderate: "Yengil",
+    medium: "O'rtacha",
+    severe: "Og'ir",
+
+    // Profile
+    profile_title: "Mening profilim",
+    profile_desc: "Sizning hisobingiz va allergen ma'lumotlaringiz.",
+    name_label: "Ism",
+    email_label: "Email",
+    allergens_label: "Allergenlar",
+    edit_allergens: "Allergenlarni tahrirlash",
+    not_set: "O'rnatilmagan",
+    no_allergens_saved: "Hali allergenlar saqlanmagan.",
     
     // Home Screen
     greeting: "Salom",
@@ -105,6 +173,21 @@ export const translations = {
     submit_code: "Kodni yuborish",
     back_home: "Bosh sahifa",
     processing: "Ishlanmoqda...",
+
+    // Scan Result
+    scan_result_title: "Skanerlash natijasi",
+    safe: "XAVFSIZ",
+    dangerous: "XAVFLI",
+    ingredients: "Tarkibi",
+    allergen_flags: "Xavfli moddalar",
+    not_found: "Mahsulot topilmadi",
+    scan_another: "Boshqa mahsulot",
+    none: "Yo'q",
+    not_listed: "Ko'rsatilmagan",
+    no_matched_allergens: "Hech qanday allergen topilmadi.",
+    product_contains_allergens: "Ushbu mahsulotda allergenlar mavjud.",
+    product_not_loaded: "Mahsulotni yuklab bo'lmadi.",
+    no_scan_result: "Skanerlash natijasi topilmadi.",
     
     // Symptom Checker
     checker_title: "Simptomlarni tekshirish",
@@ -142,5 +225,6 @@ export const translations = {
     loading: "Yuklanmoqda...",
     save: "Saqlash",
     finish: "Tugatish",
+    go_back: "Orqaga qaytish",
   }
 };

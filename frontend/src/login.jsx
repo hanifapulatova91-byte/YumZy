@@ -3,14 +3,14 @@ import { api } from './api';
 import './account.css';
 import mascot from './assets/mascot.png';
 
-function Login({ onNext, onLoginSuccess }) {
+function Login({ onNext, onLoginSuccess, t }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      alert('Please fill in email and password.');
+      alert(t('fill_fields'));
       return;
     }
 
@@ -27,7 +27,7 @@ function Login({ onNext, onLoginSuccess }) {
       onLoginSuccess({ name: data.username, ...data });
       onNext('choice'); // or whatever view comes next
     } catch (error) {
-      alert(error.message || 'Incorrect email or password.');
+      alert(error.message || t('incorrect_credentials'));
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ function Login({ onNext, onLoginSuccess }) {
       <div className="buttons">
         <input
           type="email"
-          placeholder="Username or Email"
+          placeholder={t('email_label')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}

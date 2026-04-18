@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Profile({ user, allergens = [], onNext }) {
+function Profile({ user, allergens = [], onNext, t }) {
   return (
     <div
       style={{
@@ -18,31 +18,31 @@ function Profile({ user, allergens = [], onNext }) {
           padding: '40px',
         }}
       >
-        <h1 style={{ color: '#5b8b53', marginBottom: '8px' }}>My Profile</h1>
+        <h1 style={{ color: '#5b8b53', marginBottom: '8px' }}>{t('profile_title')}</h1>
         <p style={{ color: '#a3a583', marginBottom: '18px' }}>
-          Your account and allergy details.
+          {t('profile_desc')}
         </p>
 
         <div style={boxStyle}>
-          <strong>Name</strong>
-          <div style={{ marginTop: '8px' }}>{user?.name || 'Not set'}</div>
+          <strong>{t('name_label')}</strong>
+          <div style={{ marginTop: '8px' }}>{user?.name || t('not_set')}</div>
         </div>
 
         <div style={boxStyle}>
-          <strong>Email</strong>
-          <div style={{ marginTop: '8px' }}>{user?.email || 'Not set'}</div>
+          <strong>{t('email_label')}</strong>
+          <div style={{ marginTop: '8px' }}>{user?.email || user?.username || t('not_set')}</div>
         </div>
 
         <div style={boxStyle}>
-          <strong>Allergens</strong>
+          <strong>{t('allergens_label')}</strong>
           <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {allergens.length > 0
               ? allergens.map((a, i) => (
                   <span key={i} style={allergenPillStyle}>
-                    {a.name || a} {a.severity ? `(${a.severity})` : ''}
+                    {a.name || a} {a.severity ? `(${t(a.severity.toLowerCase())})` : ''}
                   </span>
                 ))
-              : 'No allergens saved yet.'}
+              : t('no_allergens_saved')}
           </div>
         </div>
 
@@ -50,14 +50,14 @@ function Profile({ user, allergens = [], onNext }) {
           onClick={() => onNext('known')}
           style={btnPrimary}
         >
-          Edit Allergens
+          {t('edit_allergens')}
         </button>
 
         <button
           onClick={() => onNext('dashboard')}
           style={btnSecondary}
         >
-          Back to Home
+          {t('back_home')}
         </button>
       </div>
     </div>

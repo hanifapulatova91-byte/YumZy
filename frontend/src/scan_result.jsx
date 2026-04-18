@@ -1,11 +1,11 @@
 import React from 'react';
 
-function ScanResult({ scanData, onNext }) {
+function ScanResult({ scanData, onNext, t }) {
   if (!scanData) {
     return (
       <div style={{ padding: '24px', fontFamily: 'Arial, sans-serif' }}>
-        <h2>No scan result found.</h2>
-        <button onClick={() => onNext('scan')}>Go Back</button>
+        <h2>{t('no_scan_result')}</h2>
+        <button onClick={() => onNext('scan')}>{t('go_back')}</button>
       </div>
     );
   }
@@ -15,15 +15,15 @@ function ScanResult({ scanData, onNext }) {
   if (!found) {
     return (
       <div style={{ padding: '24px', fontFamily: 'Arial, sans-serif' }}>
-        <h2 style={{ color: '#c0392b' }}>Not Found</h2>
-        <p>{message || "Product couldn't be loaded."}</p>
-        <button onClick={() => onNext('scan')}>Go Back</button>
+        <h2 style={{ color: '#c0392b' }}>{t('not_found')}</h2>
+        <p>{message || t('product_not_loaded')}</p>
+        <button onClick={() => onNext('scan')}>{t('go_back')}</button>
       </div>
     );
   }
 
   const color = analysis.safe ? '#638d63' : '#c0392b';
-  const label = analysis.safe ? 'SAFE' : 'DANGEROUS';
+  const label = analysis.safe ? t('safe') : t('dangerous');
 
   return (
     <div
@@ -44,7 +44,7 @@ function ScanResult({ scanData, onNext }) {
           boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
         }}
       >
-        <h1 style={{ color: '#6f8f62' }}>Scan Result</h1>
+        <h1 style={{ color: '#6f8f62' }}>{t('scan_result_title')}</h1>
 
         <div
           style={{
@@ -63,7 +63,7 @@ function ScanResult({ scanData, onNext }) {
           </div>
           {product.brand && <div style={{ fontSize: '14px', marginBottom: '8px' }}>{product.brand}</div>}
           <div style={{ color: '#a5a98f', lineHeight: '1.5' }}>
-            {analysis.summary || (analysis.safe ? 'No matched allergens were detected.' : 'This product contains allergens.')}
+            {analysis.summary || (analysis.safe ? t('no_matched_allergens') : t('product_contains_allergens'))}
           </div>
         </div>
 
@@ -74,23 +74,23 @@ function ScanResult({ scanData, onNext }) {
         )}
 
         <div style={boxStyle}>
-          <strong>Ingredients:</strong>
-          <div style={{ fontSize: '14px', marginTop: '6px' }}>{product.ingredients || 'Not listed'}</div>
+          <strong>{t('ingredients')}:</strong>
+          <div style={{ fontSize: '14px', marginTop: '6px' }}>{product.ingredients || t('not_listed')}</div>
         </div>
 
         <div style={boxStyle}>
-          <strong>Allergen Flags:</strong>
+          <strong>{t('allergen_flags')}:</strong>
           <div style={{ color: !analysis.safe ? '#c0392b' : 'inherit', fontWeight: !analysis.safe ? 'bold' : 'normal', marginTop: '6px' }}>
-            {analysis.allergenFlags?.length > 0 ? analysis.allergenFlags.join(', ') : 'None'}
+            {analysis.allergenFlags?.length > 0 ? analysis.allergenFlags.join(', ') : t('none')}
           </div>
         </div>
 
         <button onClick={() => onNext('scan')} style={btnPrimary}>
-          Scan Another Product
+          {t('scan_another')}
         </button>
 
         <button onClick={() => onNext('dashboard')} style={btnSecondary}>
-          Back to Home
+          {t('back_home')}
         </button>
       </div>
     </div>
