@@ -36,6 +36,10 @@ app.get('/', (req, res) => {
   res.json({ message: '🍏 YumZy API is running!', version: '1.0.0' });
 });
 
+app.get('/api', (req, res) => {
+  res.json({ message: '🍏 YumZy /api is reachable!', environment: process.env.NODE_ENV || 'production' });
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Server Error:', err.stack);

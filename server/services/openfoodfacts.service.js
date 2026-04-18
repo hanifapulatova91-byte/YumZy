@@ -9,11 +9,11 @@ const OFF_API_BASE = 'https://world.openfoodfacts.org/api/v0/product';
  */
 const getProductByBarcode = async (barcode) => {
   try {
-    const url = `${OFF_API_BASE}/${barcode}?fields=product_name,brands,image_url,ingredients_text,allergens_tags,nutriments`;
+    const url = `${OFF_API_BASE}/${barcode}.json?fields=product_name,brands,image_url,ingredients_text,allergens_tags,nutriments`;
     console.log('DEBUG: Fetching barcode from:', url);
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'YumZy App/1.0 (contact@yumzy.app)',
+        'User-Agent': 'YumZy - Web App - Version 1.0 (contact@yumzy.app)',
       },
       timeout: 10000,
     });
