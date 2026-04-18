@@ -74,6 +74,7 @@ export const translations = {
     product_contains_allergens: "This product contains allergens.",
     product_not_loaded: "Product couldn't be loaded.",
     no_scan_result: "No scan result found.",
+    safe_alternatives: "Safe Alternatives",
     
     // Symptom Checker
     checker_title: "Symptom Checker",

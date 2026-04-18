@@ -98,7 +98,7 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
       const prompt = `Act as an UNCOMPROMISING Allergen Safety Engine. 
-CRITICAL: If ANY of these allergens are detected or suspected, the result MUST be safe: false.
+CRITICAL: If ANY of these allergens are detected or suspected, "safe" MUST be false.
 USER ALLERGENS TO BLOCK: ${allergenList.join(', ')}
 
 PRODUCT CONTEXT:
@@ -107,21 +107,21 @@ Ingredients: ${product.ingredientsText || 'NOT LISTED'}
 Allergen Tags: ${(product.allergensTags || []).join(', ')}
 
 TASK:
-1. Scan the "Ingredients" and "Tags" for the USER ALLERGENS.
-2. If the user is allergic to "Milk" or "Dairy", block ANYTHING containing lactose, whey, butter, cream, or milk.
-3. If the user is allergic to "Gluten" or "Wheat", block wheat, flour, or barley.
+1. Identify the EXACT words/ingredients from the list that match or contain the user's allergens.
+2. If "safe" is false, suggest 2-3 specific "Safe Alternatives" (e.g., Almond Milk, Gluten-free pasta, etc.).
 
 OUTPUT JSON ONLY:
 {
   "safe": false,
-  "allergenFlags": ["item matched"],
-  "summary": "Direct safety report in ${targetLang}."
+  "allergenFlags": ["Exact Ingredient 1", "Exact Ingredient 2"],
+  "safeAlternatives": ["Alternative 1", "Alternative 2"],
+  "summary": "Detailed safety report in ${targetLang} mentioning the specific ingredients found."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a zero-tolerance allergen detection engine. You only speak JSON.' },
+          { role: 'system', content: 'You are a zero-tolerance allergen detection engine. You provide specific ingredient flags and safe alternatives. Respond in JSON only.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },

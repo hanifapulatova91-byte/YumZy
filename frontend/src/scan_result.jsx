@@ -85,6 +85,19 @@ function ScanResult({ scanData, onNext, t }) {
           </div>
         </div>
 
+        {!analysis.safe && analysis.safeAlternatives?.length > 0 && (
+          <div style={{ ...boxStyle, border: '1px solid #689767', background: '#f5fbf7' }}>
+            <strong style={{ color: '#5b7856' }}>🥗 {t('safe_alternatives')}:</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+              {analysis.safeAlternatives.map((alt, idx) => (
+                <span key={idx} style={{ background: '#dff5e8', color: '#5b7856', padding: '4px 10px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
+                  {alt}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button onClick={() => onNext('scan')} style={btnPrimary}>
           {t('scan_another')}
         </button>
