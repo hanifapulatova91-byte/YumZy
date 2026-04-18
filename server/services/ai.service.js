@@ -98,30 +98,35 @@ const analyzeProductSafety = async (product, profile, language = 'en', guestAlle
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
       const prompt = `Act as an UNCOMPROMISING Allergen Safety Engine. 
-CRITICAL: If ANY of these allergens are detected or suspected, "safe" MUST be false.
-USER ALLERGENS TO BLOCK: ${allergenList.join(', ')}
+
+USER DATA:
+- Allergens to block: ${allergenList.join(', ')}
+- Goal: 100% User Safety.
 
 PRODUCT CONTEXT:
-Name: ${product.productName}
-Ingredients: ${product.ingredientsText || 'NOT LISTED'}
-Allergen Tags: ${(product.allergensTags || []).join(', ')}
+- Name: ${product.productName}
+- Ingredients: ${product.ingredientsText || 'NOT LISTED'}
+- Tags: ${(product.allergensTags || []).join(', ')}
 
 TASK:
-1. Identify the EXACT words/ingredients from the list that match or contain the user's allergens.
-2. If "safe" is false, suggest 2-3 specific "Safe Alternatives" (e.g., Almond Milk, Gluten-free pasta, etc.).
+1. Identify EXACT words/ingredients that match or contain the user's allergens.
+2. If "safe" is false:
+   - Identify the exact offending ingredient from the product list.
+   - Suggest 2-3 SAFE FOOD ALTERNATIVES (e.g., "Rice crackers", "Oat milk", "Fruit snacks"). DO NOT suggest raw ingredients like "Coconut oil" unless specifically relevant.
+3. LANGUAGE REQUIREMENT: The "allergenFlags", "safeAlternatives", and "summary" fields MUST be in English.
 
 OUTPUT JSON ONLY:
 {
   "safe": false,
-  "allergenFlags": ["Exact Ingredient 1", "Exact Ingredient 2"],
-  "safeAlternatives": ["Alternative 1", "Alternative 2"],
-  "summary": "Detailed safety report in ${targetLang} mentioning the specific ingredients found."
+  "allergenFlags": ["Exact Ingredient from list"],
+  "safeAlternatives": ["Specific food item alternative 1", "Specific food item alternative 2"],
+  "summary": "Clear, direct safety report in English."
 }`;
 
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a zero-tolerance allergen detection engine. You provide specific ingredient flags and safe alternatives. Respond in JSON only.' },
+          { role: 'system', content: 'You are a zero-tolerance allergen engine. You respond in English JSON only.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },

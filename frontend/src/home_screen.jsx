@@ -14,11 +14,17 @@ import phoneIcon from './assets/viber.png';
 const Dashboard = ({ userName = "Guest", onNext, t }) => {
   const getDisplayName = (name) => {
     if (!name || name === "Guest") return 'Guest';
-    if (name.includes('@')) {
-      const part = name.split('@')[0];
-      return part.charAt(0).toUpperCase() + part.slice(1);
+    
+    // If name contains @, it's just an email. Clean the prefix.
+    // If it's a real name, take the first name
+    if (!name.includes('@')) {
+      const firstName = name.split(' ')[0];
+      return firstName.charAt(0).toUpperCase() + firstName.slice(1);
     }
-    return name.charAt(0).toUpperCase() + name.slice(1);
+    
+    // If name contains @, it's an email. Clean the prefix.
+    const part = name.split('@')[0];
+    return part.charAt(0).toUpperCase() + part.slice(1);
   };
   const [activeTab, setActiveTab] = useState('home');
 

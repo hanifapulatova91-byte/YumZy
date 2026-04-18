@@ -59,6 +59,25 @@ function Scan({ onNext, allergens = [], t }) {
     }
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    const html5QrCode = new Html5Qrcode("reader");
+    try {
+      const decodedText = await html5QrCode.scanFileV2(file, true);
+      checkProduct(decodedText.decodedText);
+    } catch (err) {
+      console.error("Scanning from file failed:", err);
+      alert("Could not find a barcode in this image. Please ensure the barcode is clear and well-lit.");
+    } finally {
+      setLoading(false);
+      // Clean up the instance after file scan
+      html5QrCode.clear();
+    }
+  };
+
   return (
     <div
       style={{
@@ -93,21 +112,40 @@ function Scan({ onNext, allergens = [], t }) {
             <button onClick={() => setScannerActive(true)} style={btnPrimary} disabled={loading}>
               {t('open_cam')}
             </button>
-            <div style={{ textAlign: 'center', margin: '8px 0', color: '#9ca3af' }}>OR</div>
-            <input
-              type="text"
-              placeholder={t('manual_code')}
-              value={barcodeInput}
-              onChange={(e) => setBarcodeInput(e.target.value)}
-              style={inputStyle}
-            />
-            <button
-              onClick={() => checkProduct(barcodeInput)}
-              style={btnSecondaryLine}
-              disabled={loading || !barcodeInput.trim()}
+            
+            <button 
+              onClick={() => document.getElementById('photo-upload').click()} 
+              style={btnSecondaryLine} 
+              disabled={loading}
             >
-              {loading ? t('processing') : t('submit_code')}
+              {loading && !scannerActive ? t('processing') : t('upload_photo')}
             </button>
+            <input 
+              id="photo-upload" 
+              type="file" 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+              onChange={handleFileUpload}
+            />
+
+            <div style={{ textAlign: 'center', margin: '4px 0', color: '#9ca3af', fontSize: '13px' }}>— OR —</div>
+            
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                placeholder={t('manual_code')}
+                value={barcodeInput}
+                onChange={(e) => setBarcodeInput(e.target.value)}
+                style={{ ...inputStyle, flex: 1 }}
+              />
+              <button
+                onClick={() => checkProduct(barcodeInput)}
+                style={{ ...btnPrimary, width: 'auto', padding: '0 20px' }}
+                disabled={loading || !barcodeInput.trim()}
+              >
+                Go
+              </button>
+            </div>
           </div>
         )}
 

@@ -75,6 +75,7 @@ export const translations = {
     product_not_loaded: "Product couldn't be loaded.",
     no_scan_result: "No scan result found.",
     safe_alternatives: "Safe Alternatives",
+    upload_photo: "Upload Photo",
     
     // Symptom Checker
     checker_title: "Symptom Checker",
