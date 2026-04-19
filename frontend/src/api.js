@@ -79,6 +79,22 @@ export const api = {
       }
       return res.json();
     },
+    analyzeImage: async (imageBase64, allergens = [], productName = '') => {
+      const res = await fetch(`${API_URL}/scan/analyze-image`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ image: imageBase64, allergens, productName }),
+      });
+      if (!res.ok) {
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await res.json();
+          throw new Error(error.message || 'Image analysis failed');
+        }
+        throw new Error('Failed to analyze image. Please try again.');
+      }
+      return res.json();
+    },
   },
   chat: {
     sendMessage: async (message, allergens = []) => {

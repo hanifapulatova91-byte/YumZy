@@ -22,7 +22,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // API Routes
 app.use('/api/auth', require('./routes/auth.routes'));

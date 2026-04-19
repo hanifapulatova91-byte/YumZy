@@ -299,9 +299,90 @@ Respond in JSON:
   return { name: 'Dairy', percent: 'Unknown', note: 'Please see a doctor.' };
 };
 
+/**
+ * Analyze an ingredient list photo using GPT-4o Vision
+ * @param {string} imageBase64 - Base64 encoded image data
+ * @param {Array} allergenList - User's allergens
+ * @returns {Object} Safety analysis result
+ */
+const analyzeIngredientImage = async (imageBase64, allergenList = []) => {
+  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('your-openai-key')) {
+    return {
+      riskLevel: 'caution',
+      safe: false,
+      allergenFlags: [],
+      safeAlternatives: [],
+      extractedIngredients: 'Could not read — AI service offline.',
+      summary: 'AI Vision is not available. Please check ingredients manually.',
+    };
+  }
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a precise allergen analyzer. You read ingredient lists from photos and check for allergens. You ONLY flag allergens ACTUALLY visible in the photo. Never hallucinate. Respond in English JSON only.',
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `Read the ingredient list from this photo.
+
+USER ALLERGENS: ${allergenList.join(', ')}
+
+TASK:
+1. Extract all ingredients you can read from the image.
+2. Check if ANY of the user's allergens are present.
+3. Translate foreign ingredients to English.
+4. Use three risk levels: "safe", "caution", "dangerous".
+5. If allergens found, suggest 2-3 same-category safe alternatives.
+
+JSON OUTPUT:
+{
+  "riskLevel": "safe" or "caution" or "dangerous",
+  "safe": true or false,
+  "extractedIngredients": "Full ingredient list as read from the photo",
+  "allergenFlags": ["English Name (original word)"],
+  "safeAlternatives": ["same-category allergen-free products"],
+  "summary": "What was found and why this risk level."
+}`,
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`,
+              },
+            },
+          ],
+        },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0,
+      max_tokens: 800,
+    });
+
+    return JSON.parse(response.choices[0].message.content);
+  } catch (error) {
+    console.error('DEBUG: Vision Analysis Error:', error.message);
+    return {
+      riskLevel: 'caution',
+      safe: false,
+      allergenFlags: [],
+      safeAlternatives: [],
+      extractedIngredients: 'Could not read ingredients from image.',
+      summary: 'Failed to analyze the image. Please try a clearer photo or enter ingredients manually.',
+    };
+  }
+};
+
 module.exports = {
   analyzeProductSafety,
   generateRecipe,
   chatWithAI,
   analyzeSymptoms,
+  analyzeIngredientImage,
 };

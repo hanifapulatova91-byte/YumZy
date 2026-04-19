@@ -164,6 +164,7 @@ function App() {
         <ScanResult
           scanData={scanData}
           onNext={navigateTo}
+          allergens={allergens}
           t={t}
         />
       )}
