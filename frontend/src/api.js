@@ -81,7 +81,7 @@ export const api = {
     },
   },
   chat: {
-    sendMessage: async (message) => {
+    sendMessage: async (message, allergens = []) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
       
@@ -89,7 +89,7 @@ export const api = {
         const res = await fetch(`${API_URL}/chat`, {
           method: 'POST',
           headers: getHeaders(),
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message, allergens }),
           signal: controller.signal,
         });
         clearTimeout(timeoutId);

@@ -5,16 +5,21 @@ const Profile = require('../models/Profile.model');
 // @route   POST /api/chat
 const converseAI = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, allergens: bodyAllergens } = req.body;
 
     if (!message) {
       return res.status(400).json({ message: 'Message is required' });
     }
 
-    // Guests won't have req.user
+    // Build allergen context from both profile (if logged in) and request body
     let profile = {};
     if (req.user && req.user._id) {
        profile = await Profile.findOne({ userId: req.user._id }) || {};
+    }
+    
+    // Merge: use body allergens if profile has none (guest mode)
+    if (bodyAllergens && bodyAllergens.length > 0) {
+      profile.allergens = [...new Set([...(profile.allergens || []), ...bodyAllergens])];
     }
     
     const language = req.headers['accept-language'] || 'en';

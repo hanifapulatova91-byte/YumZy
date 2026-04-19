@@ -3,7 +3,7 @@ import { api } from './api';
 import mascotImg from './assets/chatMascot.png';
 import './chat.css';
 
-function Chat({ onNext, t }) {
+function Chat({ onNext, allergens = [], t }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
     { role: 'bot', text: t('chat_greeting') || "Hi! I'm YumZy — your personal AI nutritionist. Ask me anything!" }
@@ -24,7 +24,8 @@ function Chat({ onNext, t }) {
     setLoading(true);
 
     try {
-      const data = await api.chat.sendMessage(message);
+      const allergenNames = allergens.map(a => typeof a === 'string' ? a : a.name);
+      const data = await api.chat.sendMessage(message, allergenNames);
       setMessages(prev => [...prev, { role: 'bot', text: data.reply }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'bot', text: "Oops! 🦥 Something went wrong on my end. Could you try sending that again? I promise I'm listening!" }]);
