@@ -82,16 +82,35 @@ export const api = {
   },
   chat: {
     sendMessage: async (message) => {
-      const res = await fetch(`${API_URL}/chat`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ message }),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Chat failed');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+      
+      try {
+        const res = await fetch(`${API_URL}/chat`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ message }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        
+        if (!res.ok) {
+          // Handle non-JSON error responses (e.g., Render HTML error pages)
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const error = await res.json();
+            throw new Error(error.message || 'Chat failed');
+          }
+          throw new Error('Server is waking up — please try again in a moment!');
+        }
+        return res.json();
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          throw new Error('Response took too long — the server might be waking up. Try again!');
+        }
+        throw err;
       }
-      return res.json();
     },
   },
   recipes: {
