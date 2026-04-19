@@ -2,9 +2,32 @@ import React, { useState } from 'react';
 import { api } from './api';
 import './recipe.css';
 
-// Dynamic image helper
-const getRecipeImage = (name, index) => {
-  return `https://loremflickr.com/800/600/food,${encodeURIComponent(name || 'dish')}?lock=${index}`;
+// Food emoji and gradient based on recipe name keywords
+const getRecipeVisual = (name) => {
+  const n = (name || '').toLowerCase();
+  const map = [
+    { keys: ['chicken', 'poultry', 'hen'], emoji: '🍗', gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' },
+    { keys: ['pasta', 'spaghetti', 'noodle', 'macaroni', 'penne'], emoji: '🍝', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+    { keys: ['salad', 'greens', 'veggie', 'vegetable'], emoji: '🥗', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+    { keys: ['soup', 'stew', 'broth', 'chowder'], emoji: '🍲', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+    { keys: ['rice', 'risotto', 'pilaf', 'biryani'], emoji: '🍚', gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' },
+    { keys: ['fish', 'salmon', 'tuna', 'seafood', 'shrimp'], emoji: '🐟', gradient: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)' },
+    { keys: ['cake', 'dessert', 'sweet', 'brownie', 'cookie'], emoji: '🍰', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+    { keys: ['bread', 'toast', 'sandwich', 'wrap'], emoji: '🍞', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+    { keys: ['pizza'], emoji: '🍕', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+    { keys: ['egg', 'omelette', 'frittata'], emoji: '🍳', gradient: 'linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)' },
+    { keys: ['steak', 'beef', 'meat', 'lamb', 'pork'], emoji: '🥩', gradient: 'linear-gradient(135deg, #f5576c 0%, #ff9a9e 100%)' },
+    { keys: ['smoothie', 'shake', 'juice', 'drink'], emoji: '🥤', gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
+    { keys: ['taco', 'burrito', 'mexican'], emoji: '🌮', gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)' },
+    { keys: ['curry', 'indian', 'masala', 'tikka'], emoji: '🍛', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+    { keys: ['stir', 'wok', 'asian', 'chinese', 'thai'], emoji: '🥘', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+  ];
+
+  for (const item of map) {
+    if (item.keys.some(k => n.includes(k))) return item;
+  }
+  // Default food visual
+  return { emoji: '🍽️', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' };
 };
 
 const RecipeGenerator = ({ onBack, allergens = [] }) => {
@@ -86,8 +109,10 @@ const RecipeGenerator = ({ onBack, allergens = [] }) => {
               className={`recipe_result_card ${expandedIndex === index ? 'expanded' : ''}`}
               style={{ animationDelay: `${index * 0.15}s` }}
             >
-              <div className="recipe_image_container">
-                <img src={getRecipeImage(recipe.name || recipe.recipeName, index)} alt={recipe.name || recipe.recipeName} />
+              <div className="recipe_image_container" style={{ background: getRecipeVisual(recipe.name || recipe.recipeName).gradient }}>
+                <div style={{ fontSize: '64px', textAlign: 'center', padding: '20px 0' }}>
+                  {getRecipeVisual(recipe.name || recipe.recipeName).emoji}
+                </div>
                 <div className="recipe_time_pill">
                   ⏱ {recipe.cookingTime || '30 mins'} • 🍽 {recipe.servings || 2} servings
                 </div>
