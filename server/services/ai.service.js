@@ -108,8 +108,8 @@ PRODUCT:
 - Allergen Tags: ${(product.allergensTags || []).join(', ')}
 
 RULES:
-1. ONLY flag allergens ACTUALLY PRESENT in the "Ingredients" or "Allergen Tags". Do NOT guess.
-2. If an allergen is NOT in the data, do NOT flag it. Never hallucinate.
+1. ONLY flag an ingredient if it matches an item in "USER ALLERGENS" AND is objectively present in the "Ingredients" or "Allergen Tags". 
+2. Do NOT flag general allergens (e.g., milk, nuts, soy) if the user did not specifically list them in USER ALLERGENS. Never hallucinate.
 3. Translate foreign ingredients to English. Format: "English Name (original word)".
 4. Use THREE risk levels:
    - "safe" → No user allergens found in ingredients/tags. Ingredients data is available.
@@ -122,7 +122,7 @@ JSON OUTPUT:
 {
   "riskLevel": "safe" or "caution" or "dangerous",
   "safe": true or false,
-  "allergenFlags": ["only confirmed items from ingredients"],
+  "allergenFlags": ["ONLY matching items from USER ALLERGENS found in ingredients"],
   "safeAlternatives": ["same-category allergen-free products"],
   "summary": "Explain what was found and why this risk level was chosen."
 }`;
@@ -130,7 +130,7 @@ JSON OUTPUT:
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a factual allergen analyzer. You ONLY report allergens explicitly listed in the provided ingredients or tags. You NEVER invent or hallucinate. Use "caution" when data is incomplete. Respond in English JSON only.' },
+          { role: 'system', content: 'You are a factual allergen analyzer. You ONLY report ingredients explicitly listed in the provided data AND that match the USER ALLERGENS list. You NEVER invent or flag unrequested allergens. Use "caution" when data is incomplete. Respond in English JSON only.' },
           { role: 'user', content: prompt }
         ],
         response_format: { type: 'json_object' },
@@ -323,7 +323,7 @@ const analyzeIngredientImage = async (imageBase64, allergenList = []) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a precise allergen analyzer. You read ingredient lists from photos and check for allergens. You ONLY flag allergens ACTUALLY visible in the photo. Never hallucinate. Respond in English JSON only.',
+          content: 'You are a precise allergen analyzer. You read ingredient lists from photos and check ONLY for the specific allergens the user requested. Do NOT flag common allergens if the user did not ask for them. Never hallucinate. Respond in English JSON only.',
         },
         {
           role: 'user',
@@ -346,7 +346,7 @@ JSON OUTPUT:
   "riskLevel": "safe" or "caution" or "dangerous",
   "safe": true or false,
   "extractedIngredients": "Full ingredient list as read from the photo",
-  "allergenFlags": ["English Name (original word)"],
+  "allergenFlags": ["ONLY items matching USER ALLERGENS that were found in the photo (English Name - original word)"],
   "safeAlternatives": ["same-category allergen-free products"],
   "summary": "What was found and why this risk level."
 }`,
