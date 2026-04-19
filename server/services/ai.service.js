@@ -112,9 +112,9 @@ RULES:
 2. Do NOT flag general allergens (e.g., milk, nuts, soy) if the user did not specifically list them in USER ALLERGENS. Never hallucinate.
 3. Translate foreign ingredients to English. Format: "English Name (original word)".
 4. Use THREE risk levels:
-   - "safe" → No user allergens found in ingredients/tags. Ingredients data is available.
-   - "caution" → Ingredients are missing/incomplete, OR product "may contain" traces, OR the product category commonly contains the allergen but it's not explicitly listed.
-   - "dangerous" → User allergens are CONFIRMED present in the ingredients or tags.
+   - "safe" → No user allergens found, AND ingredients are fully listed/readable.
+   - "caution" → Ingredients are completely missing, unreadable, or missing critical data. Do not use caution if an allergen is found.
+   - "dangerous" → User allergens are CONFIRMED present anywhere in the ingredients, tags, or as a "may contain" trace warning.
 5. If "riskLevel" is "dangerous" or "caution", suggest 2-3 alternatives of the SAME product type.
 6. Respond in English only.
 
@@ -338,7 +338,10 @@ TASK:
 1. Extract all ingredients you can read from the image.
 2. Check if ANY of the user's allergens are present.
 3. Translate foreign ingredients to English.
-4. Use three risk levels: "safe", "caution", "dangerous".
+4. Use THREE risk levels:
+   - "safe" → No user allergens found, AND ingredients are fully readable.
+   - "caution" → Ingredients are unreadable or missing.
+   - "dangerous" → User allergens are present in ingredients or as a "may contain" warning.
 5. If allergens found, suggest 2-3 same-category safe alternatives.
 
 JSON OUTPUT:
