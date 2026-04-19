@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from './api';
 import { Html5Qrcode } from 'html5-qrcode';
 
@@ -6,25 +6,116 @@ function Scan({ onNext, allergens = [], t }) {
   const [loading, setLoading] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [scannerActive, setScannerActive] = useState(false);
+  const [scannerMode, setScannerMode] = useState(null); // 'native' or 'fallback'
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanningRef = useRef(false);
+
+  // Check if native BarcodeDetector is available (Chrome Android uses ML Kit)
+  const hasNativeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window;
 
   useEffect(() => {
-    let html5QrCode = null;
+    if (!scannerActive) return;
 
-    if (scannerActive) {
-      html5QrCode = new Html5Qrcode("reader");
+    let cancelled = false;
+
+    if (hasNativeDetector) {
+      // ====== NATIVE BARCODE DETECTOR (ML Kit on Android) ======
+      setScannerMode('native');
+      
+      const startNativeScanner = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+            }
+          });
+
+          if (cancelled) {
+            stream.getTracks().forEach(t => t.stop());
+            return;
+          }
+
+          streamRef.current = stream;
+
+          // Enable continuous autofocus
+          const track = stream.getVideoTracks()[0];
+          try {
+            const caps = track.getCapabilities?.();
+            if (caps?.focusMode?.includes('continuous')) {
+              await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+            }
+            // Also try to enable torch/flashlight for better scanning in low light
+            if (caps?.torch) {
+              // Don't auto-enable, but it's available if needed
+            }
+          } catch (e) {
+            console.log('Advanced camera features not available');
+          }
+
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            await videoRef.current.play();
+          }
+
+          // Create the native barcode detector
+          const detector = new BarcodeDetector({
+            formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+          });
+
+          scanningRef.current = true;
+
+          // Continuous detection loop
+          const detectLoop = async () => {
+            if (!scanningRef.current || cancelled) return;
+
+            try {
+              if (videoRef.current && videoRef.current.readyState >= 2) {
+                const barcodes = await detector.detect(videoRef.current);
+                if (barcodes.length > 0) {
+                  const code = barcodes[0].rawValue;
+                  console.log('Native BarcodeDetector found:', code);
+                  stopNativeScanner();
+                  setScannerActive(false);
+                  checkProduct(code);
+                  return;
+                }
+              }
+            } catch (err) {
+              // Detection frame failed, continue
+            }
+
+            if (scanningRef.current && !cancelled) {
+              requestAnimationFrame(detectLoop);
+            }
+          };
+
+          detectLoop();
+        } catch (err) {
+          console.error('Native scanner failed:', err);
+          alert('Could not access camera. Please ensure permissions are granted.');
+          setScannerActive(false);
+        }
+      };
+
+      startNativeScanner();
+    } else {
+      // ====== FALLBACK: html5-qrcode ======
+      setScannerMode('fallback');
+      
+      const html5QrCode = new Html5Qrcode("reader-fallback");
       const config = { 
         fps: 10, 
         qrbox: { width: 300, height: 150 },
-        aspectRatio: 1.7778,  // 16:9
+        aspectRatio: 1.7778,
       };
 
-      const startScanner = async () => {
+      const startFallback = async () => {
         try {
-          // Request high-res camera with autofocus for sharp barcode scanning
           await html5QrCode.start(
-            { 
-              facingMode: "environment",
-            }, 
+            { facingMode: "environment" },
             config,
             (decodedText) => {
               html5QrCode.stop().then(() => {
@@ -32,23 +123,20 @@ function Scan({ onNext, allergens = [], t }) {
                 checkProduct(decodedText);
               });
             },
-            () => {} // Ignored
+            () => {}
           );
-          
-          // After starting, try to enable continuous autofocus via the video track
+
+          // Try autofocus
           try {
-            const videoElement = document.querySelector('#reader video');
-            if (videoElement && videoElement.srcObject) {
-              const track = videoElement.srcObject.getVideoTracks()[0];
-              const capabilities = track.getCapabilities?.();
-              if (capabilities?.focusMode?.includes('continuous')) {
+            const videoEl = document.querySelector('#reader-fallback video');
+            if (videoEl?.srcObject) {
+              const track = videoEl.srcObject.getVideoTracks()[0];
+              const caps = track.getCapabilities?.();
+              if (caps?.focusMode?.includes('continuous')) {
                 await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
               }
             }
-          } catch (focusErr) {
-            // Autofocus not supported on this device, that's fine
-            console.log('Autofocus not available:', focusErr.message);
-          }
+          } catch (e) {}
         } catch (err) {
           console.error("Camera failed:", err);
           alert("Could not access camera. Please ensure permissions are granted.");
@@ -56,15 +144,28 @@ function Scan({ onNext, allergens = [], t }) {
         }
       };
 
-      startScanner();
+      startFallback();
+
+      return () => {
+        if (html5QrCode.isScanning) {
+          html5QrCode.stop().catch(e => console.error('Failed to stop scanner', e));
+        }
+      };
     }
 
     return () => {
-      if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().catch(e => console.error('Failed to stop scanner', e));
-      }
+      cancelled = true;
+      stopNativeScanner();
     };
   }, [scannerActive]);
+
+  const stopNativeScanner = () => {
+    scanningRef.current = false;
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+  };
 
   const checkProduct = async (barcodeToScan) => {
     if (!barcodeToScan) return;
@@ -85,16 +186,34 @@ function Scan({ onNext, allergens = [], t }) {
     if (!file) return;
 
     setLoading(true);
-    const html5QrCode = new Html5Qrcode("reader");
+
+    // Try native BarcodeDetector for image files too
+    if (hasNativeDetector) {
+      try {
+        const img = await createImageBitmap(file);
+        const detector = new BarcodeDetector({
+          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+        });
+        const barcodes = await detector.detect(img);
+        if (barcodes.length > 0) {
+          checkProduct(barcodes[0].rawValue);
+          return;
+        }
+      } catch (e) {
+        console.log('Native file scan failed, trying fallback');
+      }
+    }
+
+    // Fallback to html5-qrcode for file scanning
+    const html5QrCode = new Html5Qrcode("reader-fallback");
     try {
       const decodedText = await html5QrCode.scanFileV2(file, true);
       checkProduct(decodedText.decodedText);
     } catch (err) {
       console.error("Scanning from file failed:", err);
       alert("Could not find a barcode in this image. Please ensure the barcode is clear and well-lit.");
-    } finally {
       setLoading(false);
-      // Clean up the instance after file scan
+    } finally {
       html5QrCode.clear();
     }
   };
@@ -123,8 +242,51 @@ function Scan({ onNext, allergens = [], t }) {
 
         {scannerActive ? (
           <div style={{ marginBottom: '20px' }}>
-            <div id="reader" style={{ width: '100%', borderRadius: '12px', overflow: 'hidden' }}></div>
-            <button onClick={() => setScannerActive(false)} style={{ ...btnSecondary, marginTop: '12px' }}>
+            {/* Native scanner: raw video element */}
+            {scannerMode === 'native' && (
+              <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#000' }}>
+                <video 
+                  ref={videoRef} 
+                  playsInline 
+                  muted
+                  style={{ width: '100%', display: 'block', borderRadius: '12px' }} 
+                />
+                {/* Scan line overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '10%',
+                  right: '10%',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent, #5d8a60, transparent)',
+                  animation: 'scanPulse 1.5s ease-in-out infinite',
+                  transform: 'translateY(-50%)',
+                }} />
+                {/* Scan area box */}
+                <div style={{
+                  position: 'absolute',
+                  top: '30%',
+                  left: '10%',
+                  right: '10%',
+                  bottom: '30%',
+                  border: '2px solid rgba(93, 138, 96, 0.6)',
+                  borderRadius: '8px',
+                }} />
+              </div>
+            )}
+
+            {/* Fallback scanner: html5-qrcode container */}
+            {scannerMode === 'fallback' && (
+              <div id="reader-fallback" style={{ width: '100%', borderRadius: '12px', overflow: 'hidden' }}></div>
+            )}
+
+            <button 
+              onClick={() => {
+                stopNativeScanner();
+                setScannerActive(false);
+              }} 
+              style={{ ...btnSecondary, marginTop: '12px' }}
+            >
               {t('cancel_cam')}
             </button>
           </div>
@@ -177,6 +339,13 @@ function Scan({ onNext, allergens = [], t }) {
           {t('back_home')}
         </button>
       </div>
+
+      <style>{`
+        @keyframes scanPulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
