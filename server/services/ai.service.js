@@ -112,9 +112,9 @@ RULES:
 2. Do NOT flag general allergens (e.g., milk, nuts, soy) if the user did not specifically list them in USER ALLERGENS. Never hallucinate.
 3. Translate foreign ingredients to English. Format: "English Name (original word)".
 4. Use THREE risk levels:
-   - "safe" → No user allergens found, AND ingredients are fully listed/readable.
-   - "caution" → Ingredients are completely missing, unreadable, or missing critical data. Do not use caution if an allergen is found.
-   - "dangerous" → User allergens are CONFIRMED present anywhere in the ingredients, tags, or as a "may contain" trace warning.
+   - "safe" → No user allergens found, AND ingredients are fully listed.
+   - "caution" → Product has a "may contain" traces warning for a user allergen, OR ingredients are completely missing/unreadable. In your summary, clearly explain that it is due to a "may contain" cross-contamination risk.
+   - "dangerous" → User allergens are CONFIRMED actively present in the main ingredients list.
 5. If "riskLevel" is "dangerous" or "caution", suggest 2-3 alternatives of the SAME product type.
 6. Respond in English only.
 
@@ -340,8 +340,8 @@ TASK:
 3. Translate foreign ingredients to English.
 4. Use THREE risk levels:
    - "safe" → No user allergens found, AND ingredients are fully readable.
-   - "caution" → Ingredients are unreadable or missing.
-   - "dangerous" → User allergens are present in ingredients or as a "may contain" warning.
+   - "caution" → Product has a "may contain" warning for an allergen, OR ingredients are unreadable. Ensure summary explains the "may contain" risk.
+   - "dangerous" → User allergens are actively listed in the main ingredients.
 5. If allergens found, suggest 2-3 same-category safe alternatives.
 
 JSON OUTPUT:
