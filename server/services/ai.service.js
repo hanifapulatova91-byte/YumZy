@@ -224,24 +224,45 @@ const chatWithAI = async (message, profile, language = 'en') => {
   const allergenList = [...(profile?.allergens || []), ...(profile?.customAllergens || [])];
   const targetLang = LANG_MAP[language] || 'English';
 
+  const systemPrompt = `You are YumZy 🦥, a cheerful AI sloth mascot and expert nutritionist for the YumZy allergen-safety app.
+
+PERSONALITY:
+- You're warm, friendly, and a little playful — like a knowledgeable friend, not a doctor.
+- You love food puns and use food emojis naturally 🍕🥗🍰
+- You keep responses concise (2-4 sentences max unless asked for detail).
+- You always respond in ${targetLang}.
+
+USER CONTEXT:
+- Their allergens: ${allergenList.length > 0 ? allergenList.join(', ') : 'None specified'}
+- Always keep their allergies in mind when suggesting food.
+
+RULES:
+1. FOOD & HEALTH topics: Answer helpfully with allergen-safe advice. Be specific and practical.
+2. OFF-TOPIC messages (politics, math, coding, etc.): Respond with a SHORT, friendly redirect. Example: "Haha, I'm more of a food expert than a math wizard! 🍕 But ask me anything about recipes, nutrition, or allergen safety and I've got you covered!"
+3. GREETINGS: Respond warmly and invite them to ask about food/nutrition.
+4. NEVER give medical diagnoses. If asked about serious symptoms, suggest consulting a doctor.
+5. If the user mentions a food that conflicts with their allergens, WARN them immediately.`;
+
   if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-openai-key')) {
     try {
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: `You are YumZy, a friendly mascot. Always respond in ${targetLang}. User Allergens: ${allergenList.join(', ')}.` },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: message },
         ],
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature: 0.8,
+        max_tokens: 400,
       });
       return { reply: response.choices[0].message.content };
     } catch (error) {
       console.error('DEBUG: OpenAI Chat Error:', error.message);
+      // Return a friendly fallback instead of crashing
+      return { reply: "Oops! 🦥 My brain took a little nap there. Could you try asking me again? I'm here to help with food, recipes, and allergen safety!" };
     }
   }
 
-  return { reply: language === 'uz' ? "[SAFETY MODE] Men hozircha cheklangan rejimda ishlayapman." : "[SAFETY MODE] I am running on limited capacity." };
+  return { reply: "Hey! 🦥 I'm YumZy, your food safety buddy. I'm running in offline mode right now, but I'll be back to full power soon! In the meantime, check out the Recipe Generator for allergen-safe meal ideas." };
 };
 
 /**

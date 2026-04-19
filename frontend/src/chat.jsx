@@ -27,7 +27,7 @@ function Chat({ onNext, t }) {
       const data = await api.chat.sendMessage(message);
       setMessages(prev => [...prev, { role: 'bot', text: data.reply }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'bot', text: `Sorry, I couldn't process that: ${error.message}` }]);
+      setMessages(prev => [...prev, { role: 'bot', text: "Oops! 🦥 Something went wrong on my end. Could you try sending that again? I promise I'm listening!" }]);
     } finally {
       setLoading(false);
     }
