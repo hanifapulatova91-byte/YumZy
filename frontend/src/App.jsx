@@ -42,9 +42,12 @@ function App() {
             const loaded = profile.allergens.map(a => ({ name: a, severity: 'MODERATE' }));
             setAllergens(loaded);
             setView('dashboard');
+          } else {
+            setView('dashboard'); // Default to dashboard or choice? Let's default to dashboard, the dashboard has an add button.
+            // Wait, choice is the Allergen selector.
           }
         }).catch(() => {
-          // Profile fetch failed, user can still proceed manually
+          setView('dashboard');
         });
       } catch {
         setUser(null);
