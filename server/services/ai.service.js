@@ -109,13 +109,13 @@ PRODUCT:
 
 RULES:
 1. ONLY flag an ingredient if it matches an item in "USER ALLERGENS" AND is objectively present in the "Ingredients" or "Allergen Tags". 
-2. Do NOT flag general allergens (e.g., milk, nuts, soy) if the user did not specifically list them in USER ALLERGENS. Never hallucinate.
-3. Translate foreign ingredients to English. Format: "English Name (original word)".
+2. Do NOT flag general allergens (e.g., milk, nuts, soy) if the user did not specifically list them in USER ALLERGENS.
+3. Translate foreign ingredients to English.
 4. Use THREE risk levels:
-   - "safe" → No user allergens found, AND ingredients are fully listed.
-   - "caution" → Product has a "may contain" traces warning for a user allergen, OR ingredients are completely missing/unreadable. In your summary, clearly explain that it is due to a "may contain" cross-contamination risk.
-   - "dangerous" → User allergens are CONFIRMED actively present in the main ingredients list.
-5. If "riskLevel" is "dangerous" or "caution", suggest 2-3 alternatives of the SAME product type.
+   - "safe" → No user allergens found, AND ingredients are explicitly present and readable.
+   - "caution" → Product has a "may contain" traces warning. CRITICAL: If the "Ingredients" field says "NOT LISTED" or is empty, you MUST return "caution" because safety cannot be verified without data!
+   - "dangerous" → User allergens are actively present in the ingredients.
+5. If "riskLevel" is "dangerous", suggest 2-3 safer alternatives of the SAME product type. CRITICAL: The alternatives you suggest MUST BE strictly 100% FREE from the USER ALLERGENS!
 6. Respond in English only.
 
 JSON OUTPUT:
@@ -340,9 +340,9 @@ TASK:
 3. Translate foreign ingredients to English.
 4. Use THREE risk levels:
    - "safe" → No user allergens found, AND ingredients are fully readable.
-   - "caution" → Product has a "may contain" warning for an allergen, OR ingredients are unreadable. Ensure summary explains the "may contain" risk.
+   - "caution" → Product has a "may contain" warning. CRITICAL: If the image is blurry, or ingredients are unreadable or missing, you MUST return "caution" because safety cannot be verified!
    - "dangerous" → User allergens are actively listed in the main ingredients.
-5. If allergens found, suggest 2-3 same-category safe alternatives.
+5. If allergens found, suggest 2-3 safer alternatives of the SAME product type. CRITICAL: The alternatives you suggest MUST BE strictly 100% FREE from the USER ALLERGENS!
 
 JSON OUTPUT:
 {
