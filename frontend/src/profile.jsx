@@ -1,6 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { api } from './api';
 
-function Profile({ user, allergens = [], onNext, t }) {
+function Profile({ user, setUser, allergens = [], onNext, onLogout, t }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(user?.name || '');
+  const [loading, setLoading] = useState(false);
+
+  const handleSaveName = async () => {
+    if (!editName.trim()) return;
+    setLoading(true);
+    try {
+      const updatedUser = await api.auth.updateName(editName);
+      
+      // Update local storage and app state
+      const existingData = JSON.parse(localStorage.getItem('yumzy_user') || '{}');
+      const newData = { ...existingData, ...updatedUser };
+      localStorage.setItem('yumzy_user', JSON.stringify(newData));
+      if (setUser) setUser(newData);
+      
+      setIsEditing(false);
+    } catch (err) {
+      alert("Failed to update name");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -18,23 +43,47 @@ function Profile({ user, allergens = [], onNext, t }) {
           padding: '40px',
         }}
       >
-        <h1 style={{ color: '#5b8b53', marginBottom: '8px' }}>{t('profile_title')}</h1>
+        <h1 style={{ color: '#5b8b53', marginBottom: '8px' }}>{t('profile_title') || 'My Profile'}</h1>
         <p style={{ color: '#a3a583', marginBottom: '18px' }}>
-          {t('profile_desc')}
+          {t('profile_desc') || 'Manage your account'}
         </p>
 
         <div style={boxStyle}>
-          <strong>{t('name_label')}</strong>
-          <div style={{ marginTop: '8px' }}>{user?.name || t('not_set')}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <strong>{t('name_label') || 'Name'}</strong>
+            {!isEditing ? (
+              <button 
+                onClick={() => setIsEditing(true)}
+                style={{ background: 'none', border: 'none', color: '#6fa166', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                Edit
+              </button>
+            ) : (
+              <div>
+                <button onClick={() => setIsEditing(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', marginRight: '8px' }}>Cancel</button>
+                <button onClick={handleSaveName} disabled={loading} style={{ background: '#6fa166', color: '#fff', border: 'none', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer' }}>Save</button>
+              </div>
+            )}
+          </div>
+          
+          {isEditing ? (
+            <input 
+              value={editName}
+              onChange={e => setEditName(e.target.value)}
+              style={{ width: '100%', padding: '8px', marginTop: '8px', borderRadius: '8px', border: '1px solid #ccc' }}
+            />
+          ) : (
+            <div style={{ marginTop: '8px' }}>{user?.name || t('not_set') || 'Not set'}</div>
+          )}
         </div>
 
         <div style={boxStyle}>
-          <strong>{t('email_label')}</strong>
-          <div style={{ marginTop: '8px' }}>{user?.email || user?.username || t('not_set')}</div>
+          <strong>{t('email_label') || 'Email'}</strong>
+          <div style={{ marginTop: '8px' }}>{user?.email || user?.username || t('not_set') || 'Not set'}</div>
         </div>
 
         <div style={boxStyle}>
-          <strong>{t('allergens_label')}</strong>
+          <strong>{t('allergens_label') || 'Allergens'}</strong>
           <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {allergens.length > 0
               ? allergens.map((a, i) => (
@@ -42,7 +91,7 @@ function Profile({ user, allergens = [], onNext, t }) {
                     {a.name || a} {a.severity ? `(${t(a.severity.toLowerCase())})` : ''}
                   </span>
                 ))
-              : t('no_allergens_saved')}
+              : t('no_allergens_saved') || 'No allergens'}
           </div>
         </div>
 
@@ -50,14 +99,21 @@ function Profile({ user, allergens = [], onNext, t }) {
           onClick={() => onNext('known')}
           style={btnPrimary}
         >
-          {t('edit_allergens')}
+          {t('edit_allergens') || 'Edit Allergens'}
         </button>
 
         <button
           onClick={() => onNext('dashboard')}
           style={btnSecondary}
         >
-          {t('back_home')}
+          {t('back_home') || 'Back'}
+        </button>
+
+        <button
+          onClick={onLogout}
+          style={{ ...btnSecondary, background: '#fee2e2', color: '#ef4444', marginTop: '12px' }}
+        >
+          Log Out
         </button>
       </div>
     </div>

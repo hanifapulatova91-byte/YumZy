@@ -2,7 +2,13 @@ import React from 'react';
 import './account.css';
 import mascot from './assets/mascot.png';
 
-const AccApp = ({ onNext, onGuest, t, lang, toggleLanguage }) => {
+const AccApp = ({ onNext, onGuest, user, t, lang, toggleLanguage }) => {
+  const getDisplayName = (name) => {
+    if (!name || name === "Guest") return 'Guest';
+    if (!name.includes('@')) return name.split(' ')[0];
+    return name.split('@')[0];
+  };
+
   return (
     <div className="account_container">
       <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
@@ -26,7 +32,7 @@ const AccApp = ({ onNext, onGuest, t, lang, toggleLanguage }) => {
         <h1 className="account_title">
           YumZy <span className="star_icon">*</span>
         </h1>
-        <p className="account_subtitle">{t('smart_assistant')}</p>
+        <p className="account_subtitle">{t('smart_assistant') || 'Your Allergy Safe Assistant'}</p>
       </div>
 
       <div className="image_wrapper">
@@ -34,23 +40,43 @@ const AccApp = ({ onNext, onGuest, t, lang, toggleLanguage }) => {
       </div>
 
       <div className="buttons">
-        <button
-          className="btn_google"
-          onClick={() => onNext('login')}
-        >
-          <span>{t('log_in')}</span>
-        </button>
+        {user && user.username ? (
+          <>
+            <button
+              className="btn_google"
+              style={{ background: '#6fa166', color: '#fff' }}
+              onClick={() => onNext('dashboard')}
+            >
+              <span>Continue as {getDisplayName(user.name || user.username)}</span>
+            </button>
+            <button
+              className="btn_apple"
+              onClick={onGuest} 
+            >
+              <span>Switch Account</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="btn_google"
+              onClick={() => onNext('login')}
+            >
+              <span>{t('log_in') || 'Log In'}</span>
+            </button>
 
-        <button
-          className="btn_apple"
-          onClick={() => onNext('signup')}
-        >
-          <span>{t('sign_up')}</span>
-        </button>
+            <button
+              className="btn_apple"
+              onClick={() => onNext('signup')}
+            >
+              <span>{t('sign_up') || 'Sign Up'}</span>
+            </button>
 
-        <button onClick={onGuest} className="btn_guest">
-          {t('continue_guest')}
-        </button>
+            <button onClick={onGuest} className="btn_guest">
+              {t('continue_guest') || 'Continue as Guest'}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

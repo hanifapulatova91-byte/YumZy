@@ -44,6 +44,15 @@ export const api = {
       if (!res.ok) throw new Error('Not authorized');
       return res.json();
     },
+    updateName: async (name) => {
+      const res = await fetch(`${API_URL}/auth/name`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error('Update failed');
+      return res.json();
+    },
   },
   profile: {
     getProfile: async () => {

@@ -41,14 +41,8 @@ function App() {
             // Convert string allergens to objects with severity
             const loaded = profile.allergens.map(a => ({ name: a, severity: 'MODERATE' }));
             setAllergens(loaded);
-            setView('dashboard');
-          } else {
-            setView('dashboard'); // Default to dashboard or choice? Let's default to dashboard, the dashboard has an add button.
-            // Wait, choice is the Allergen selector.
           }
-        }).catch(() => {
-          setView('dashboard');
-        });
+        }).catch(() => {});
       } catch {
         setUser(null);
       }
@@ -83,6 +77,14 @@ function App() {
     localStorage.removeItem('yumzy_user');
     setAllergens([]);
     setView('choice');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('yumzy_token');
+    localStorage.removeItem('yumzy_user');
+    setAllergens([]);
+    setView('landing');
   };
 
   return (
@@ -183,8 +185,10 @@ function App() {
       {view === 'profile' && (
         <Profile
           user={user}
+          setUser={setUser}
           allergens={allergens}
           onNext={navigateTo}
+          onLogout={handleLogout}
           t={t}
         />
       )}

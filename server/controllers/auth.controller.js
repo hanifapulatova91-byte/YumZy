@@ -103,6 +103,18 @@ const getMe = async (req, res) => {
   }
 };
 
+// @desc    Update current user name
+// @route   PUT /api/auth/name
+const updateName = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const user = await User.findByIdAndUpdate(req.user._id, { name: name ? name.trim() : '' }, { new: true });
+    res.json({ _id: user._id, name: user.name, username: user.username, quizCompleted: user.quizCompleted });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    RESET ENTIRE DATABASE - DANGEROUS
 // @route   GET /api/auth/reset-everything-danger-zone
 const dangerResetDatabase = async (req, res) => {
@@ -132,4 +144,4 @@ const dangerResetDatabase = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, dangerResetDatabase };
+module.exports = { register, login, getMe, updateName, dangerResetDatabase };
